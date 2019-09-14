@@ -1,0 +1,12 @@
+{{extend 'layout.html'}}
+<h1>
+    {{=T('Anagrafica clienti')}}
+</h1>
+{{=BEAUTIFY(clienti_form)}}
+
+
+<script language="javascript">
+    
+    
+    $("#clienti_luogo_consegna_1").after(" (Denominazione, indirizzo, cap, città, provincia)")
+</script>

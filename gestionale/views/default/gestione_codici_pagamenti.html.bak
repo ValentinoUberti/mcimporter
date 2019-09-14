@@ -1,0 +1,3 @@
+{{extend 'layout.html'}}
+<h1>This is the default/gestione_codici_pagamenti.html template</h1>
+{{=BEAUTIFY(response._vars)}}

@@ -1,0 +1,226 @@
+{{extend 'layout.html'}}
+<script src="{{=URL('static','js/jquery.sortable.js')}}"></script>
+<input type="hidden" id="codice_articolo">
+
+<div class="row">
+
+<div class="col-md-4">
+{{=articoli_form}}
+</div>
+
+
+<div class="col-md-8">
+	<div class="row">
+		<div class="col-md-8">
+		
+		<div id="lista_lavorazioni_per_articolo">
+		
+		
+		</div>
+		
+		
+		</div>
+		
+		<div class="col-md-4">
+		<h4> Lavorazioni disponibili</h4>
+		<div id="lista_lavorazioni_possibili">
+		</div>
+		
+		</div>
+	</div>
+
+
+</div>
+
+
+</div>
+
+<script>
+
+
+
+function lista_lavorazioni(codice_articolo)
+{
+	 $("#codice_articolo").val(codice_articolo)
+	 
+	 web2py_component("{{=URL('produzione', 'lista_lavorazioni_per_articolo')}}" +  "?codice_articolo=" + codice_articolo, target='lista_lavorazioni_per_articolo')
+	 web2py_component("{{=URL('produzione', 'lista_lavorazioni_possibili')}}" , target='lista_lavorazioni_possibili')
+	 
+}
+
+ function inserisci_lavorazione(id_lavorazione)
+ 
+ {
+	 
+     
+     justoop.produzioneRpc.returnLavorazioneNameFromid(id_lavorazione).success(function _(data)
+        {
+    	     
+        	
+        	 
+        	 $('#lista_lavorazioni_articolo').append('<li class="list-group-item"><span class="glyphicon glyphicon-move"></span> <span data-commento="" data-tempoattrezzagio="00:00:00" data-tempolavorazionesenzaattrezzaggio="00:00:00" data-idlavorazione='+id_lavorazione+'>'+data.result+'</span> | <a href="#" onclick="parentNode.parentNode.removeChild(parentNode)">Rimuovi</a></li>');	 
+        	 $('#lista_lavorazioni_articolo').sortable({
+        		    placeholderClass: 'list-group-item',
+        		    handle: 'span'
+        		}).bind('sortupdate',function(e, ui) { add_data_position()});
+        
+        	 add_data_position()
+     	});
+	 
+	 
+ 
+ }
+ 
+ function dettaglio()
+ {
+	 
+	 try {
+	 codice_articolo=$("#codice_articolo").val()
+	 $("#modal_codice_articolo").html(codice_articolo)
+	 
+	 nome_lavorazione = $(this).html()
+	 $("#modal_nome_lavorazione").html(nome_lavorazione)
+	 
+	 id_lavorazione = $(this).data("idlavorazione")
+	 posizione = $(this).data("position")
+	 
+	 tempoattrezzagio = $(this).data("tempoattrezzagio")
+	 tempolavorazione = $(this).data("tempolavorazionesenzaattrezzaggio")
+	 
+	 commento = $(this).data("commento")
+	 
+	 if (commento=="undefined") commento="";
+	 
+	 res = tempoattrezzagio.split(":")
+	 ore = res[0]
+	 minuti = res[1]
+	 secondi = res[2]
+	 
+	  
+	 if ( (isNaN(ore) || isNaN(minuti) || isNaN(secondi) ) || (ore.length <1) || (minuti.length <1) || (secondi.length <1))
+		{
+			ore = "00"
+			minuti = "00"
+			secondi = "00"
+		}
+
+
+	 $("#attrezzaggio_ore").val(ore)
+	 $("#attrezzaggio_minuti").val(minuti)
+	 $("#attrezzaggio_secondi").val(secondi)
+		
+	  
+	 res = tempolavorazione.split(":")
+	 ore = res[0]
+	 minuti = res[1]
+	 secondi = res[2]
+	 
+	 
+	 if ( (isNaN(ore) || isNaN(minuti) || isNaN(secondi) ) || (ore.length <1) || (minuti.length <1) || (secondi.length <1))
+			
+		{
+			ore = "00"
+			minuti = "00"
+			secondi = "00"
+		}
+	 
+	 
+	 $("#commento").val(commento)
+	 
+	 $("#lavorazione_ore").val(ore)
+	 $("#lavorazione_minuti").val(minuti)
+	 $("#lavorazione_secondi").val(secondi)
+	
+	 
+	 
+	 $("#modal_id_lavorazione").val(id_lavorazione)
+	 $("#modal_posizione").val(posizione)
+	 
+	 
+	 
+	 
+	 $("#myModal").modal('show');
+	 }
+	 catch (err){
+		 
+		 
+	 }
+ }
+ 
+ function add_data_position()
+ {
+	 
+	 var position=1;
+	 $("#lista_lavorazioni_articolo li").each(function(){
+		 	
+		 	
+		 	v2 = $(this).children().next()
+		 	
+		 	
+		 	
+		 	v2.first().attr("data-position",position);
+		 	position++;
+		 	
+		 	
+		 	/* Dati per la modale */
+		 	
+		 	
+		 	v2.first().removeAttr("onclick");
+		 	v2.first().click(dettaglio);
+	 });
+	 
+ }
+ 
+ function serialize_ul()
+ 
+ 
+ {
+	 //data-commento="" data-tempoAttrezzagio="" data-tempoLavorazioneSenzaAttrezzaggio=""
+	 var myObject = [];
+	 o = $("#lista_lavorazioni_articolo li")
+	 var posizione = 1
+	 o.each(function(){
+		 	
+		 	
+		 	v2 = $(this).children().next()
+		 	var lavorazioneObj={}
+		    
+		 	lavorazioneObj["id_lavorazione"]=v2.data("idlavorazione")
+		 	lavorazioneObj["posizione"]=posizione
+		 	posizione +=1
+		 	
+		 	lavorazioneObj["commento"]=v2.data("commento")
+		 	lavorazioneObj["tempoattrezzagio"]=v2.data("tempoattrezzagio")
+		 	lavorazioneObj["tempolavorazionesenzaattrezzaggio"]=v2.data("tempolavorazionesenzaattrezzaggio")
+		 	
+		 	lavorazioneObj["descrizione_lavorazione"]=v2.html()
+		 	
+		 
+		 
+	    	myObject.push(lavorazioneObj)
+	 });
+	 
+	 
+	 
+	 myJson = JSON.stringify(myObject);
+	 
+	 codice_articolo=$("#codice_articolo").val()
+	 
+	 justoop.produzioneRpc.saveLavorazioniPerArticolo(codice_articolo,myJson).success(function _(data)
+     {
+ 	     
+     		
+     
+      
+  	});
+	 
+ }
+ 
+ 
+
+</script>
+
+
+
+
+

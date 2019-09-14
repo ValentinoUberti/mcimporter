@@ -1,0 +1,39 @@
+{{extend 'layout.html'}}
+<h1>Stampa lavorazioni da codice ordine</h1>
+<div class="row">
+
+<div class="col-md-4">
+{{=ordini_clienti_form}}
+</div>
+
+
+<div class="col-md-8">
+	<div id="lista_codici_per_articolo">
+</div>
+
+
+</div>
+
+
+<script>
+
+
+
+
+function lista_articoli_da_codice_ordine(id_ordine_cliente)
+{
+
+	 
+	 web2py_component("{{=URL('produzione', 'lista_articoli_da_codice_ordine')}}" +  "?id_ordine_cliente=" + id_ordine_cliente, target='lista_codici_per_articolo')
+	 
+	 
+}
+
+//stampa_fasi_da_articolo('1164','17310379','1')
+
+
+
+</script>
+
+
+

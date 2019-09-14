@@ -1,0 +1,39 @@
+{{extend 'layout.html'}}
+<h1>Aggiungi articolo a listino fornitori</h1>
+<h3>
+    Codice articolo : {{=codice_articolo}}
+    
+</h3>
+{{=form}}
+
+
+<script language="javascript">
+
+    $(document).ready(function() {
+        $("#articolo_in_listino_fornitori_nome_cliente").change(function() {
+  get_listino()});
+    });
+    
+    function get_listino()
+    {
+        nome_cliente =  $("#articolo_in_listino_fornitori_nome_cliente").val();
+        
+        justoop.gestionaleRpc.returnListini(nome_cliente,"fornitore").success(function _(data)
+                                                               {
+            objs = $.parseJSON(data.result)
+            $("#articolo_in_listino_fornitori_listino").empty();
+            
+            $.each(objs, function (i,item) {
+            
+            $('#articolo_in_listino_fornitori_listino').append($('<option>', { 
+                    value: item.nome_listino,
+                    text : item.nome_listino }))
+                                                
+                                                });
+            
+        });
+                                                               
+        
+    }
+ 
+</script>

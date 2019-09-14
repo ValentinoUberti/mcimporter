@@ -1,0 +1,37 @@
+{{extend 'layout.html'}}
+<h1>Seleziona le fatture da accorpare</h1>
+{{=riba_form}}
+<br>
+<br>
+<div class="row">
+<div class="col-md-4">
+        
+
+    
+    
+    </div>
+
+    <div class="col-md-4">
+        
+       {{=button}}
+    
+    
+    </div>
+
+    
+</div>
+
+
+<script language="javascript">
+ function accorpa(id)
+ 
+ 
+    {   
+        checkboxid="check"+id;
+        val=$("#"+checkboxid).prop("checked");
+    
+        justoop.gestionaleRpc.accorpa(id,val).success(function _(data)
+                                                               {
+        });
+    }
+</script>

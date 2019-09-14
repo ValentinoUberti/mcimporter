@@ -1,0 +1,44 @@
+{{extend 'layout.html'}}
+<h1>Resoconto</h1>
+
+<b> Banca scelta : </b> {{=banca_scelta}} <b>Numero disposizione : </b> {{=numero_disposizione}}
+<br>
+<br>
+
+{{=html}}
+
+
+<div class="row">
+<div class="col-md-4">
+  </div>
+
+    <div class="col-md-2">
+   
+    {{=indietro}}
+    </div>
+    <div class="col-md-2">
+     {{=avanti}}
+     </div>
+      <div class="col-md-2">
+     <h4>Totale distinta : {{=totale_distinta}}</h4>
+     </div>
+
+
+    
+</div>
+
+
+<script src="{{=URL('static','js/jquery.dataTables.min.js')}}"></script>
+
+
+<script language="javascript">
+
+$(document).ready(function() {
+    $('#resoconto').DataTable(
+    {"info":     false,
+    "pagingType": "full_numbers"}
+    
+    );
+} );
+
+</script>

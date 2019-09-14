@@ -1,0 +1,159 @@
+{{extend 'layout.html'}}
+<div class="row">
+    <div class="col-md-8">
+        <h3>Seleziona le fatture per l'emissione Riba</h3>
+        
+         {{=LOAD('default','fatture_form',ajax=True)}}
+    </div>
+    <div class="col-md-4" >
+        <h3>Elenco fatture scelte</h3>
+        <div id="id2">
+            
+       
+         {{=LOAD('default','fatture_per_riba',ajax=True)}}
+             </div>
+    </div>
+</div>
+<br>
+
+<br>
+<div class="row">
+  
+        <div class="col-md-4">
+        <b>Banca in cui ricevere il pagamento </b>
+            <select id="banca_azienda">
+        {{for o in banca_azienda:}}
+            <option name="{{=o}}">{{=o}}</option>
+        {{pass}}
+        </select>
+            
+            
+           
+       
+        </div>
+       
+</div>
+
+<div class="row">
+    <div class="col-md-5">
+        
+    </div>
+    <div class="col-md-4">
+        
+        <input type="button" class="btn btn_default" onclick="successivoRiba()" value="Successivo" ></input>
+       
+    
+    </div>
+
+    
+</div>
+
+<script language="javascript">
+    
+  var $idown;  // Keep it outside of the function, so it's initialized once.
+
+     
+	  function successivoRiba()
+  
+	  {   
+	      var banca=$("#banca_azienda").val()
+	      
+	      justoop.gestionaleRpc.successivoRiba(banca).success(function _(data)
+	                                                             {
+		  
+		  
+		  if (typeof(data.error) == "undefined")
+          {
+			  
+			  location.href="/gestionale/default/emissione_riba_2";
+              
+          }
+		  else
+			  {
+			  
+			  ele = $(".w2p_flash.alert.alert-dismissable")
+			  ele.css("background-color","#f4424b")
+			  
+			  }
+	      
+	  });
+	  }
+    
+    function aggiungiFattura()
+    {   justoop.gestionaleRpc.aggiungiFattura(arguments).success(function _(data)
+                                                               {
+        web2py_component('{{=URL(r=request,c='default',f='fatture_per_riba')}}','id2');
+    });
+    }
+
+    function inserisciDdt(id_ddt)
+    {
+        if(!confirm('Confermi di aver controllato tutti i dati?')) return "";
+    
+        luogo_consegna=$("#luogo_consegna").val()
+         trasporto=$("#trasporto").val()
+          ditta=$("#ditta").val()
+           domicilio=$("#domicilio").val()
+            scatola=$("#scatola").val()
+             numero_colli=$("#numero_colli").val()
+              porto=$("#porto").val()
+               annotazioni=$("#annotazioni").val()
+                peso=$("#peso").val()
+                causale=$("#causale").val()
+                data_scelta = ""
+        
+    
+       justoop.gestionaleRpc.insertDdt(id_ddt,luogo_consegna,trasporto,ditta,domicilio,scatola,numero_colli,porto,annotazioni,peso,causale,data_scelta).success(function _(data)
+       
+                                                                                                                                   
+                                                                                                                                            
+       { 
+           //debugger
+           if (typeof(data.error) == "undefined")
+           {
+               console.log("Downloading");
+               w = window.open("../../static/html.pdf")   
+               location.href="/gestionale/default/ddt_clienti";
+           }
+       });
+           
+    
+    }
+    
+    function inserisciDdtPreview(id_ddt)
+    {
+    
+        luogo_consegna=$("#luogo_consegna").val()
+         trasporto=$("#trasporto").val()
+          ditta=$("#ditta").val()
+           domicilio=$("#domicilio").val()
+            scatola=$("#scatola").val()
+             numero_colli=$("#numero_colli").val()
+              porto=$("#porto").val()
+               annotazioni=$("#annotazioni").val()
+                peso=$("#peso").val()
+                causale=$("#causale").val()
+                data_scelta = ""
+        
+    
+       justoop.gestionaleRpc.insertDdtPreview(id_ddt,luogo_consegna,trasporto,ditta,domicilio,scatola,numero_colli,porto,annotazioni,peso,causale,data_scelta).success(function _(data)
+       
+                                                                                                                                   
+                                                                                                                                            
+       { 
+           //debugger
+           if (typeof(data.error) == "undefined")
+           {
+               console.log("Downloading");
+               w = window.open("../../static/html.pdf")   
+               
+           }
+       });
+           
+    
+    }
+    
+  
+
+
+</script>

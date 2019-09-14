@@ -1,0 +1,9 @@
+ IB60I3307076210219OpenGest                                                                                      E      
+ 140000001            300419300000000000001420-0707657330            0306933160            60I33421                    E
+ 200000001Microcarp               Strada statale 416      26020 Castelleone (CR)  Italia                                
+ 300000001INGERSOLL RAND ITALIA SPA                                   10147270150                                       
+ 400000001STRADA CASSANESE, 108         20060MI                                                   IT                    
+ 500000001R.F. 168/19 del 28/02/2019              IMPORTO  0000000001420                            12048950153         
+ 5100000010000000002MICROCARP S.R.L.                                                                                    
+ 700000001                                                                                                              
+ EF60I3307076210219OpenGest                  00000010000000000001420000000000000000000009                        E      

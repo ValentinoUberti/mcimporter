@@ -1,0 +1,5 @@
+{{extend 'layout.html'}}
+<h1>
+    {{=T('Gestione sottoconti')}}
+</h1>
+{{=BEAUTIFY(sottoconti_form)}}

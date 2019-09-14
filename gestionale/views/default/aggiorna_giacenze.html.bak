@@ -1,0 +1,39 @@
+{{extend 'layout.html'}}
+<script src="{{=URL('static','js/underscore-min.js')}}"></script>
+<h3>
+    Aggiornamento giacenze
+</h3>
+<div class="row">
+    <div class="col-md-4">
+        <b>Barcode : </b><input type="text" id="barcode">
+    </div>
+    <div class="col-md-6">
+    <div id="id2">
+        
+    </div>
+    </div>
+</div>
+
+
+<script language="javascript">
+    
+    //{{=LOAD('default','return_dettagli_articolo_da_riga_ordine',ajax=True)}}
+    
+    function load_barcode_data()
+    {
+        id_riga_ordine =  $('#barcode').val()
+        $('#barcode').val("")
+        web2py_component("{{=URL('default', 'return_dettagli_articolo_da_riga_ordine')}}" +
+                 "?id_riga_ordine=" + id_riga_ordine,
+                 target='id2')
+        
+        
+    }
+    
+    $(document).ready(function ()
+                      {
+    $('#barcode').keyup(_.debounce(load_barcode_data , 200));
+    
+    })
+    
+</script>

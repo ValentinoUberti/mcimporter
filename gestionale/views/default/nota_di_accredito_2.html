@@ -1,0 +1,213 @@
+{{extend 'layout.html'}}
+<h3>
+  Nota di accredito per il cliente {{=nome_cliente}}
+  {{if 'leonardo' in nome_cliente.lower():}}
+  <select id="enti_leonardo">
+      
+    {{  index=0
+        for ente in enti:}}
+        <option value="{{=ente.ente}}" {{if index==0:}} selected {{pass}}>{{=ente.ente}}</option>
+        {{index+=1}}
+        {{pass}}
+    
+    
+  </select>
+  {{pass}}
+</h3>
+<div class="row">
+
+<div class="col-md-3">
+    <b>Causale </b> : <input id="causale">
+</div>
+
+<div class="col-md-3">
+    <b>Rif. ordine </b> : <input id="riferimento_ordine">
+</div>
+
+<div class="col-md-3">
+    <b>Cig </b> : <input id="cig">
+</div>
+
+<div class="col-md-3">
+    <b>Cup </b> : <input id="cup">
+</div>
+
+
+
+</div>
+<hr>
+<div class="row">
+    <div class="col-md-6">
+    
+        {{=form_righe}}
+    </div>
+     <div class="col-md-6">
+    {{if new_order:}}
+       
+        
+        
+        {{=LOAD('default', 'articoli_per_ordini',vars = {'cliente':nome_cliente},ajax=True)}}
+        {{pass}}
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col-md-4">
+        
+    </div>
+    <div class="col-md-4">
+        <button class="btn btn_default" onclick="creaFatturaPreviewIstantaneaAccredito({{=id_cliente}})">
+            ANTEPRIMA
+        </button>
+        <button class="btn btn_default" onclick="creaFatturaIstantaneaAccredito({{=id_cliente}})">
+            CREA E SALVA FATTURA
+        </button>
+        
+        <button class="btn btn_default" onclick="creaFatturaXmlAccredito({{=id_cliente}})">
+            CREA FATTURA ELETTRONICA
+        </button>
+    </div>
+</div>
+<script language="javascript">
+    
+       
+    function creaFatturaIstantaneaAccredito()
+    {
+    
+    if(!confirm('Confermi di aver controllato tutti i dati?')) return "";
+    justoop.gestionaleRpc.creaFatturaIstantaneaAccredito(arguments).success(function _(data)
+                                                               {
+        //debugger
+           if (typeof(data.error) == "undefined")
+           {
+        w = window.open("../../static/fattura.pdf")
+           }
+    
+    });
+    }
+    
+      function creaFatturaPreviewIstantaneaAccredito()
+    {
+    
+    //if(!confirm('Confermi di aver controllato tutti i dati?')) return "";
+    justoop.gestionaleRpc.creaFatturaPreviewIstantaneaAccredito(arguments).success(function _(data)
+                                                               {
+        
+        //debugger
+           if (typeof(data.error) == "undefined")
+           {
+        w = window.open("../../static/fattura.pdf")
+           }
+    });
+    }
+    
+</script>
+
+<script language="javascript">
+   
+    var cliente = "{{=nome_cliente}}"
+    
+    
+    function return_description()
+    {
+        
+         if ($("#righe_in_fattura_istantanea_codice_articolo").val().length > 0)
+         {
+             a = $("#righe_in_fattura_istantanea_codice_articolo").val()
+            
+             
+         justoop.gestionaleRpc.returnDescription(a).success(function _(data)
+                                                       
+            {
+                $("#righe_in_fattura_istantanea_descrizione").val(data.result);
+            });
+         
+         }
+    
+    
+    }
+    
+    
+    
+    function aggiungiArticolo(codice)
+    {
+       $("#righe_in_fattura_istantanea_codice_articolo").val(codice);
+       return_description();
+       
+    }
+    
+   
+        
+    //$("#righe_in_fattura_istantanea_codice_articolo").prop('readonly',true);
+        
+    function creaFatturaXmlAccredito()
+    {
+
+    ente = $("#enti_leonardo").val()
+    
+    /*
+    <div class="col-md-3">
+    <b>Causale </b> : <input id="causale">
+</div>
+
+<div class="col-md-3">
+    <b>Rif. ordine </b> : <input id="riferimento_ordine">
+</div>
+
+<div class="col-md-3">
+    <b>Cig </b> : <input id="cig">
+</div>
+
+<div class="col-md-3">
+    <b>Cup </b> : <input id="cup">
+</div>
+
+    */
+    causale=$("#causale").val()
+    riferimento_ordine=$("#riferimento_ordine").val()
+    cig=$("#cig").val()
+    cup=$("#cup").val()
+
+    arguments['1']='accredito'
+    arguments['2']=ente
+    arguments['3'] =causale
+    arguments['4'] = riferimento_ordine
+    arguments['5'] = cig
+    arguments['6'] = cup
+    justoop.gestionaleRpc.creaFatturaXmlAccredito(arguments).success(function _(data)
+                                                               {
+
+           
+           response = JSON.parse(data.result)
+
+            
+           if (typeof(response.error) == "undefined")
+           {
+            
+            url_file="{{=URL('static','uploads')}}/fatture/xml/"+response.filename
+
+            var element = document.createElement('a');
+            element.setAttribute('href', url_file);
+            element.setAttribute('download', response.filename);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            
+           } else {
+
+
+               alert(response.msg)
+           }
+        
+    });
+
+    
+   
+
+    }
+   
+     
+</script>
+
+

@@ -1,0 +1,3 @@
+{{extend 'layout.html'}}
+<h1>This is the default/fatture_per_riba.html template</h1>
+{{=BEAUTIFY(response._vars)}}

@@ -1,0 +1,48 @@
+{{extend 'layout.html'}}
+<h3>
+   DDT emessi dal {{=dal.strftime('%d-%m-%Y')}} al {{=al.strftime('%d-%m-%Y') - datetime.timedelta(days=2)}} per il cliente {{=nome_cliente}}
+</h3>
+
+<div class="row">
+    <div class="col-md-4">
+        {{=ddt_da_fatturare}}
+    </div>
+    <div class="col-md-8" >
+        <h3>DDT da fatturare</h3>
+        <div id="id2">
+            
+       
+        {{=LOAD('default','ddt_da_fatturare',ajax=True)}}
+             </div>
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col-md-4">
+        
+    </div>
+    <div class="col-md-4">
+        <button class="btn btn-success" onclick="creaFattura({{=id_cliente}})">
+            Crea Fattura
+        </button>
+    </div>
+</div>
+<script language="javascript">
+    
+     function aggiungiDDT()
+    {   justoop.gestionaleRpc.aggiungiDDT(arguments).success(function _(data)
+                                                               {
+        web2py_component('{{=URL(r=request,c='default',f='ddt_da_fatturare')}}','id2');
+    });
+    }
+    
+    function creaFattura()
+    {
+    justoop.gestionaleRpc.creaFattura(arguments).success(function _(data)
+                                                               {
+        w = window.open("../../static/fattura.pdf")
+    
+    });
+    }
+    
+</script>

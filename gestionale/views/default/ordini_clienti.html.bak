@@ -1,0 +1,55 @@
+{{extend 'layout.html'}}
+<h1>Inserisci nuovo ordine cliente</h1>
+{{=ordini_clienti_form}}
+<hr>
+<h2>
+    Ordini inseriti
+</h2>
+{{=righe_in_ordine_cliente_form}}
+
+
+<script language="javascript">
+
+    $(document).ready(function() {
+        $("#ordine_cliente_nome_cliente").change(function() {
+         get_listino()
+         get_pagamenti();
+        
+        });
+        
+ 
+    });
+    
+    function get_listino()
+    {
+        nome_cliente =  $("#ordine_cliente_nome_cliente").val();
+        justoop.gestionaleRpc.returnListini(nome_cliente).success(function _(data)
+                                                               {
+            objs = $.parseJSON(data.result)
+            $("#ordine_cliente_listino").empty();
+            
+            $.each(objs, function (i,item) {
+            
+            $('#ordine_cliente_listino').append($('<option>', { 
+                    value: item.nome_listino,
+                    text : item.nome_listino }))
+                                                
+                                                });
+            
+        });
+    }   
+        function get_pagamenti()
+    {
+        nome_cliente =  $("#ordine_cliente_nome_cliente").val();
+        justoop.gestionaleRpc.returnPagamenti(nome_cliente).success(function _(data)
+                                                               {
+            s = data.result
+                            $("#ordine_cliente_pagamento").val(s);             
+                                                });
+            
+    }
+                                                               
+        
+    
+ 
+</script>

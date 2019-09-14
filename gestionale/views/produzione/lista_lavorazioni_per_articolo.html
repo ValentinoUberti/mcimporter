@@ -1,0 +1,173 @@
+<style>
+
+
+</style>
+<section>
+                    <h2>Lavorazioni per articolo {{=codice_articolo}}</h2>
+                    
+                    <ul class="list-group list-group-sortable-handles" id="lista_lavorazioni_articolo">
+                       
+                    </ul>
+               <button onclick="serialize_ul()">Salva</button>     
+</section>
+
+<script>
+
+$(function() {
+	
+	
+var lavorazioni={{=XML(lavorazioni)}}	
+
+$.each(lavorazioni, function(i, item) {
+	
+	var descrizione_lavorazione = lavorazioni[i].descrizione_lavorazione
+	var id_lavorazione = lavorazioni[i].id_lavorazione
+	
+	var commento = lavorazioni[i].commento
+	if (commento=="undefined") commento=""
+	
+	var tempoattrezzagio = lavorazioni[i].tempoattrezzagio
+	var tempolavorazionesenzaattrezzaggio= lavorazioni[i].tempolavorazionesenzaattrezzaggio
+	
+	
+	
+	try {
+		res = tempoattrezzagio.split(":")
+		ore = res[0]
+		minuti = res[1]
+		secondi = res[2]
+		
+		if (isNaN(ore) || isNaN(minuti) || isNaN(secondi))
+		{
+			tempoattrezzagio="00:00:00"
+		}
+		
+		
+	}
+	catch(err)
+	{
+		tempoattrezzagio="00:00:00"
+		
+	}
+	
+	
+	
+	$('#lista_lavorazioni_articolo').append('<li class="list-group-item"><span class="glyphicon glyphicon-move"></span> <span data-commento="'+commento+'" data-tempoattrezzagio="'+tempoattrezzagio+'" data-tempolavorazionesenzaattrezzaggio="'+tempolavorazionesenzaattrezzaggio+'" data-idlavorazione='+id_lavorazione+'>'+descrizione_lavorazione+'</span> | <a href="#" onclick="parentNode.parentNode.removeChild(parentNode)">Rimuovi</a></li>');
+	})
+		
+$('#lista_lavorazioni_articolo').sortable({
+    placeholderClass: 'list-group-item',
+    handle: 'span'
+}).bind('sortupdate',function(e, ui) { add_data_position()});
+
+
+add_data_position()
+
+});
+
+function salvaDettagliLavorazione()
+
+{
+	attrezzaggio_ore = $("#attrezzaggio_ore").val()
+	attrezzaggio_minuti = $("#attrezzaggio_minuti").val()
+	attrezzaggio_secondi = $("#attrezzaggio_secondi").val()
+	
+	lavorazione_ore = $("#lavorazione_ore").val()
+	lavorazione_minuti = $("#lavorazione_minuti").val()
+	lavorazione_secondi = $("#lavorazione_secondi").val()
+	
+	id_lavorazione = $("#modal_idlavorazione").val()
+	posizione = $("#modal_posizione").val()
+	
+	attrezzaggio = attrezzaggio_ore+":"+attrezzaggio_minuti+":"+attrezzaggio_secondi
+	lavorazione = lavorazione_ore+":"+lavorazione_minuti+":"+lavorazione_secondi
+	
+	commento=$("#commento").val()
+	
+	el = $("span[data-position='"+posizione+"']");
+	
+	el.data("tempoattrezzagio",attrezzaggio)
+	el.data("tempolavorazionesenzaattrezzaggio",lavorazione)
+	el.data("commento",commento)
+	
+	
+	
+}
+
+</script>
+
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-lg">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Dettaglio lavorazione per articolo <span id="modal_codice_articolo"></span>
+        <br>Lavorazione : <span id="modal_nome_lavorazione"></span>
+        </h4>
+      </div>
+      <div class="modal-body">
+      
+      <input type="hidden" id="modal_idlavorazione"/>
+      <input type="hidden" id="modal_posizione"/>
+      
+       
+       <div class="row">
+       
+		       <div class="col-md-4">
+		       <p>Tempo attrezzaggio</p>
+		       
+		       </div>
+		       
+		       <div class="col-md-8">
+		       <input type="number" id="attrezzaggio_ore" value="00" style='width:3em'  min="0" max="600"/> :
+		       <input type="number" id="attrezzaggio_minuti" value="00" style='width:3em' min="0" max="60" /> :
+		       <input type="number" id="attrezzaggio_secondi" value="00" style='width:3em' min="0" max="60"/>
+		        
+		       </div>
+           
+       </div>
+       
+       <div class="row">
+       
+		       <div class="col-md-4">
+		       <p>Tempo lavorazione (escluso attrezzaggio)</p>
+		       
+		       </div>
+		       
+		       <div class="col-md-8">
+		       <input type="number" id="lavorazione_ore" value="00" style='width:3em' min="0" max="600"/> :
+		       <input type="number" id="lavorazione_minuti" value="00" style='width:3em' min="0" max="60"/> :
+		       <input type="number" id="lavorazione_secondi" value="00" style='width:3em' min="0" max="60"/>
+		        
+		       </div>
+           
+       </div>
+       
+       <div class="row">
+       
+		       <div class="col-md-4">
+		       <p>Commento</p>
+		       
+		       </div>
+		       
+		       <div class="col-md-8">
+		       <textarea id="commento"></textarea>
+		        
+		       </div>
+           
+       </div>
+       
+       
+      </div>
+      <div class="modal-footer">
+       <button type="button" class="btn btn-default" data-dismiss="modal" onclick="salvaDettagliLavorazione()">Salva</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>

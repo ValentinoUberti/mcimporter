@@ -1,0 +1,5 @@
+{{extend 'layout.html'}}
+<h1>
+    Selezionare il cliente a cui associare un nuovo listino articoli
+</h1>
+{{=articoli_form}}

@@ -1,0 +1,42 @@
+{{extend 'layout.html'}}
+<div class="row">
+    <div class="col-md-3">
+        <b>Codice ordine :</b> {{=ultimo_codice_ordine}}
+    </div>
+     <div class="col-md-3">
+        <b>Nome cliente :</b> {{=nome_cliente}}
+    </div>
+     <div class="col-md-3">
+        <b>Listino :</b> {{=listino}}
+    </div>
+     <div class="col-md-3">
+        <b>Riferimento ordine cliente :</b> {{=riferimento_ordine_cliente}}
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col-md-4">
+        {{=form_dettaglio_bolla}}
+    </div>
+    <div class="col-md-8">
+        {{=righe_in_ordine_cliente_form}}
+    </div>
+</div>
+
+
+
+
+<script language="javascript">
+    var listino = "{{=listino}}"
+    var cliente = "{{=nome_cliente}}"
+    
+    $( document ).ready(function() {
+    $("#righe_in_ordine_cliente_codice_articolo").on('change keyup paste', function () {
+   return_price()
+});
+    $("#righe_in_ordine_cliente_quantita").on('change keyup paste', function () {
+   return_price()
+});
+    });
+     
+</script>

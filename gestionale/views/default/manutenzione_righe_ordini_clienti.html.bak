@@ -1,0 +1,3 @@
+{{extend 'layout.html'}}
+<h1>This is the default/manutenzione_righe_ordini_clienti.html template</h1>
+{{=BEAUTIFY(response._vars)}}

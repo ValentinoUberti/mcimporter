@@ -1,0 +1,67 @@
+<h3> Codice ordine interno : {{=row.ultimo_codice_ordine}}   -  Riferimento ordine cliente : {{=row.riferimento_ordine_cliente}}</h3>
+<h3> Cliente : {{=row.nome_cliente}} </h3>
+
+
+
+{{=righe_in_ordine_cliente_form}}
+
+
+<script>
+$(document).ready(function()
+{
+$('#lista_codici_per_articolo > div > div.web2py_table > div > table td:nth-child(1)').hide();
+$('#lista_codici_per_articolo > div > div.web2py_table > div > table th:nth-child(1)').hide();
+})
+
+
+
+function crea_fasi_per_articolo(codice_articolo)
+{
+url = "/gestionale/produzione/lista_articoli?keywords="+codice_articolo
+window.open(url,'_blank');
+}
+
+function stampa_fasi_da_articolo(id_ordine,codice_articolo,riga)
+{
+
+
+justoop.produzioneRpc.stampLavorazioniPerArticolo(id_ordine,codice_articolo,riga).success(function _(data)
+        {
+           
+                 filename = url = "/gestionale/static/lavorazioni/"+data.result
+                 
+                 
+       		 $('#div_creazione_fasi').html('<object style="width: 100%; height: 820px" id="pdf" type="application/pdf"></object>');
+		 $("#pdf").prop("data",filename)
+		 $('#myModal3').modal('show');
+		 
+        });
+}
+
+
+
+</script>
+
+<!-- Modal -->
+<div id="myModal3" class="modal fade" role="dialog">
+  <div class="modal-dialog-full">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Lista lavorazioni</h4>
+      </div>
+      <div class="modal-body2" >
+        <div id="div_creazione_fasi" style="overflow: auto;">
+			
+		</div>
+      </div>
+      <div class="modal-footer">
+      
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+

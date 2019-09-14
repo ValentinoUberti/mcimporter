@@ -1,0 +1,3 @@
+{{extend 'layout.html'}}
+<h1>This is the default/aspetto_esteriore_dei_beni.html template</h1>
+{{=BEAUTIFY(response._vars)}}

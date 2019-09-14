@@ -1,0 +1,127 @@
+{{extend 'layout.html'}}
+<h3>
+   DDT emessi e non ancora fatturati dal {{=dal.strftime('%d-%m-%Y')}} al {{=al_fixed.strftime('%d-%m-%Y')}} per il cliente {{=nome_cliente}}
+</h3>
+
+<div class="row">
+    <div class="col-md-4">
+        {{=ddt_da_fatturare}}
+    </div>
+    <div class="col-md-8" >
+        <h3>DDT da fatturare</h3>
+        <div id="id2">
+            
+       
+        {{=LOAD('default','ddt_da_fatturare',ajax=True)}}
+             </div>
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col-md-4">
+        
+    </div>
+    <div class="col-md-4">
+        <button class="btn btn_default" onclick="creaFatturaPreview({{=id_cliente}})">
+            ANTEPRIMA
+        </button>
+        <button class="btn btn_default" onclick="creaFattura({{=id_cliente}})">
+            CREA E SALVA FATTURA
+        </button>
+        <button class="btn btn_default" onclick="creaFatturaXml({{=id_cliente}})">
+            CREA FATTURA ELETTRONICA
+        </button>
+    </div>
+</div>
+
+<span id="download">
+
+
+</span>
+
+
+<script language="javascript">
+    
+     function aggiungiDDT()
+    {   justoop.gestionaleRpc.aggiungiDDT(arguments).success(function _(data)
+                                                               {
+        web2py_component('{{=URL(r=request,c='default',f='ddt_da_fatturare')}}','id2');
+    });
+    }
+    
+    function creaFattura()
+    {
+    
+    if(!confirm('Confermi di aver controllato tutti i dati?')) return "";
+    justoop.gestionaleRpc.creaFattura(arguments).success(function _(data)
+                                                               {
+        //debugger
+           if (typeof(data.error) == "undefined")
+           {
+           location.reload();
+           w = window.open("../../static/fattura.pdf")
+           }
+    
+    });
+    }
+    
+      function creaFatturaPreview()
+    {
+    
+    //if(!confirm('Confermi di aver controllato tutti i dati?')) return "";
+    justoop.gestionaleRpc.creaFatturaPreview(arguments).success(function _(data)
+                                                               {
+        
+        //debugger
+           if (typeof(data.error) == "undefined")
+           {
+        	w = window.open("../../static/fattura.pdf")
+        	
+           }
+    });
+
+    
+   
+
+    }
+
+    function creaFatturaXml()
+    {
+    
+    //if(!confirm('Confermi di aver controllato tutti i dati?')) return "";
+    arguments['1']='fattura'
+    justoop.gestionaleRpc.creaFatturaXml(arguments).success(function _(data)
+                                                               {
+
+           
+           response = JSON.parse(data.result)
+
+            
+           if (typeof(response.error) == "undefined")
+           {
+            
+            url_file="{{=URL('static','uploads')}}/fatture/xml/"+response.filename
+
+            var element = document.createElement('a');
+            element.setAttribute('href', url_file);
+            element.setAttribute('download', response.filename);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            
+           } else {
+
+
+               alert(response.msg)
+           }
+        
+    });
+
+    
+   
+
+    }
+ 
+    
+</script>

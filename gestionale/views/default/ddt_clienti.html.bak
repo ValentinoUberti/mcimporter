@@ -1,0 +1,3 @@
+{{extend 'layout.html'}}
+<h1>DDT clienti</h1>
+{{=righe_in_ordine_cliente_form}}

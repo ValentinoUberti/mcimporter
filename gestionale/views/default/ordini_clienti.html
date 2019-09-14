@@ -1,0 +1,82 @@
+{{extend 'layout.html'}}
+<h1>Inserisci nuovo ordine cliente</h1>
+{{=ordini_clienti_form}}
+<hr>
+<h2>
+    Ordini inseriti
+</h2>
+{{=righe_in_ordine_cliente_form}}
+
+
+<script language="javascript">
+
+    $(document).ready(function() {
+
+        //$(ordine_cliente_ente__label).before().hide()
+        //$(ordine_cliente_ente).before().hide()
+
+        $("#ordine_cliente_nome_cliente").change(function() {
+         
+         show_ente(); 
+         get_listino()
+         get_pagamenti();
+         
+        });
+        
+ 
+    });
+    
+
+    function show_ente() {
+
+     nome_cliente =  $("#ordine_cliente_nome_cliente").val();
+     
+     if (nome_cliente.indexOf('LEONARDO SPA') ==0 )
+        {
+
+            $(ordine_cliente_ente__label).before().show()
+            $(ordine_cliente_ente).before().show()
+        }
+        else
+        
+        {
+
+            //$(ordine_cliente_ente__label).before().hide()
+            //$(ordine_cliente_ente).before().hide()
+
+        }
+
+    }
+    function get_listino()
+    {
+        nome_cliente =  $("#ordine_cliente_nome_cliente").val();
+        justoop.gestionaleRpc.returnListini(nome_cliente,"cliente").success(function _(data)
+                                                               {
+            objs = $.parseJSON(data.result)
+            $("#ordine_cliente_listino").empty();
+            
+            $.each(objs, function (i,item) {
+            
+            $('#ordine_cliente_listino').append($('<option>', { 
+                    value: item.nome_listino,
+                    text : item.nome_listino }))
+                                                
+                                                });
+            
+        });
+    }   
+        function get_pagamenti()
+    {
+        nome_cliente =  $("#ordine_cliente_nome_cliente").val();
+        justoop.gestionaleRpc.returnPagamenti(nome_cliente,"cliente").success(function _(data)
+                                                               {
+            s = data.result
+                            $("#ordine_cliente_pagamento").val(s);             
+                                                });
+            
+    }
+                                                               
+        
+    
+ 
+</script>

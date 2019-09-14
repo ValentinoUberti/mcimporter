@@ -1,0 +1,44 @@
+workers:
+  - attendanceName: ""
+    paName: "SACCHELLI ALESSANDRO"
+    startingRow: 6
+  - attendanceName: ""
+    paName: "MANTOVANI ANGELO FRANCESCO"
+    startingRow: 18
+  - attendanceName: ""
+    paName: "SACCHELLI SARA"
+    startingRow: 30
+  - attendanceName: ""
+    paName: "PILLA CRISTIAN ALFREDO"
+    startingRow: 43
+  - attendanceName: ""
+    paName: "PESHKU ERVIOLA"
+    startingRow: 55
+  - attendanceName: ""
+    paName: "SAMARANI STEFANIA"
+    startingRow: 67
+  - attendanceName: ""
+    paName: "BRUNOFERO MATTEO"
+    startingRow: 80
+  - attendanceName: ""
+    paName: "DONEDA ORNELLA"
+    startingRow: 92
+  - attendanceName: ""
+    paName: "BITCA MARIAN"
+    startingRow: 104
+  - attendanceName: ""
+    paName: "CITU IONUT"
+    startingRow: 117
+  - attendanceName: ""
+    paName: "FERRANTI MAURIZIO"
+    startingRow: 129
+  - attendanceName: ""
+    paName: "GAMBITTA MATTEO"
+    startingRow: 141
+  - attendanceName: ""
+    paName: "GALLI MARCO"
+    startingRow: 154
+  - attendanceName: ""
+    paName: "UBERTI VALENTINO"
+    startingRow: 164
+  

@@ -1,0 +1,140 @@
+{{extend 'layout.html'}}
+<h3>
+  Fatturazione istantanea per il cliente {{=nome_cliente}}
+</h3>
+
+<div class="row">
+    <div class="col-md-6">
+    
+        {{=form_righe}}
+    </div>
+    
+     <div class="col-md-6">
+    {{if new_order:}}
+       
+        
+        
+        {{=LOAD('default', 'articoli_per_ordini',vars = {'cliente':nome_cliente},ajax=True)}}
+        {{pass}}
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col-md-4">
+        
+    </div>
+    <div class="col-md-4">
+        <button class="btn btn_default" onclick="creaFatturaPreviewIstantanea({{=id_cliente}})">
+            ANTEPRIMA
+        </button>
+        <button class="btn btn_default" onclick="creaFatturaIstantanea({{=id_cliente}})">
+            CREA E SALVA FATTURA
+        </button>
+        <button class="btn btn_default" onclick="creaFatturaXmlIstantanea({{=id_cliente}})">
+            CREA FATTURA ELETTRONICA
+        </button>
+    </div>
+</div>
+<script language="javascript">
+    
+       
+    function creaFatturaIstantanea()
+    {
+    
+    if(!confirm('Confermi di aver controllato tutti i dati?')) return "";
+    justoop.gestionaleRpc.creaFatturaIstantanea(arguments).success(function _(data)
+                                                               {
+        //debugger
+           if (typeof(data.error) == "undefined")
+           {
+        w = window.open("../../static/fattura.pdf")
+           }
+    
+    });
+    }
+    
+      function creaFatturaPreviewIstantanea()
+    {
+    
+    //if(!confirm('Confermi di aver controllato tutti i dati?')) return "";
+    justoop.gestionaleRpc.creaFatturaPreviewIstantanea(arguments).success(function _(data)
+                                                               {
+        
+        //debugger
+           if (typeof(data.error) == "undefined")
+           {
+        w = window.open("../../static/fattura.pdf")
+           }
+    });
+    }
+    
+      
+      
+      
+      function return_description()
+      {
+          
+           if ($("#righe_in_fattura_istantanea_codice_articolo").val().length > 0)
+           {
+               a = $("#righe_in_fattura_istantanea_codice_articolo").val()
+              
+               
+           justoop.gestionaleRpc.returnDescription(a).success(function _(data)
+                                                         
+              {
+                  $("#righe_in_fattura_istantanea_descrizione").val(data.result);
+              });
+           
+           }
+      
+      
+      }
+      
+      function aggiungiArticolo(codice)
+      {
+         $("#righe_in_fattura_istantanea_codice_articolo").val(codice);
+         return_description();
+         
+      }
+
+
+      function creaFatturaXmlIstantanea()
+    {
+    
+    //if(!confirm('Confermi di aver controllato tutti i dati?')) return "";
+    arguments['1']='fattura'
+    justoop.gestionaleRpc.creaFatturaXmlIstantanea(arguments).success(function _(data)
+                                                               {
+
+           
+           response = JSON.parse(data.result)
+
+            
+           if (typeof(response.error) == "undefined")
+           {
+            
+            url_file="{{=URL('static','uploads')}}/fatture/xml/"+response.filename
+
+            var element = document.createElement('a');
+            element.setAttribute('href', url_file);
+            element.setAttribute('download', response.filename);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            
+           } else {
+
+
+               alert(response.msg)
+           }
+        
+    });
+
+    
+   
+
+    }
+
+
+</script>

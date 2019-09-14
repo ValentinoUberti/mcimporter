@@ -1,0 +1,3 @@
+{{extend 'layout.html'}}
+<h1>This is the default/aggiungi_righe_a_ordini_fornitor.html template</h1>
+{{=BEAUTIFY(response._vars)}}

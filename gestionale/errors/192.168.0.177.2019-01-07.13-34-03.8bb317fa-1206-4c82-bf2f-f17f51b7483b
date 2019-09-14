@@ -1,0 +1,994 @@
+(dp1
+S'output'
+p2
+S"<class 'pymysql.err.InternalError'> (1205, u'Lock wait timeout exceeded; try restarting transaction')"
+p3
+sS'layer'
+p4
+S'C:\\workspace\\web2py\\applications\\gestionale\\models\\db.py'
+p5
+sS'code'
+p6
+S'# -*- coding: utf-8 -*-\n\n# -------------------------------------------------------------------------\n# This scaffolding model makes your app work on Google App Engine too\n# File is released under public domain and you can use without limitations\n# -------------------------------------------------------------------------\nfrom sets import Set\n\nif request.global_settings.web2py_version < "2.14.1":\n    raise HTTP(500, "Requires web2py 2.13.3 or newer")\n\n# -------------------------------------------------------------------------\n# if SSL/HTTPS is properly configured and you want all HTTP requests to\n# be redirected to HTTPS, uncomment the line below:\n# -------------------------------------------------------------------------\n# request.requires_https()\n\n# -------------------------------------------------------------------------\n# app configuration made easy. Look inside private/appconfig.ini\n# -------------------------------------------------------------------------\nfrom gluon.contrib.appconfig import AppConfig\n\n# -------------------------------------------------------------------------\n# once in production, remove reload=True to gain full speed\n# -------------------------------------------------------------------------\nmyconf = AppConfig()\n\nif not request.env.web2py_runtime_gae:\n    # ---------------------------------------------------------------------\n    # if NOT running on Google App Engine use SQLite or other DB\n    # ---------------------------------------------------------------------\n    db = DAL(myconf.get(\'db.uri\'),\n             pool_size=myconf.get(\'db.pool_size\'),\n             migrate_enabled=myconf.get(\'db.migrate\'),\n             check_reserved=[\'all\'],entity_quoting=False,fake_migrate=True)\nelse:\n    # ---------------------------------------------------------------------\n    # connect to Google BigTable (optional \'google:datastore://namespace\')\n    # ---------------------------------------------------------------------\n    db = DAL(\'google:datastore+ndb\')\n    # ---------------------------------------------------------------------\n    # store sessions and tickets there\n    # ---------------------------------------------------------------------\n    session.connect(request, response, db=db)\n    # ---------------------------------------------------------------------\n    # or store session in Memcache, Redis, etc.\n    # from gluon.contrib.memdb import MEMDB\n    # from google.appengine.api.memcache import Client\n    # session.connect(request, response, db = MEMDB(Client()))\n    # ---------------------------------------------------------------------\n\n# -------------------------------------------------------------------------\n# by default give a view/generic.extension to all actions from localhost\n# none otherwise. a pattern can be \'controller/function.extension\'\n# -------------------------------------------------------------------------\nresponse.generic_patterns = [\'*\'] if request.is_local else []\n# -------------------------------------------------------------------------\n# choose a style for forms\n# -------------------------------------------------------------------------\nresponse.formstyle = myconf.get(\'forms.formstyle\')  # or \'bootstrap3_stacked\' or \'bootstrap2\' or other\nresponse.form_label_separator = myconf.get(\'forms.separator\') or \'\'\n\n# -------------------------------------------------------------------------\n# (optional) optimize handling of static files\n# -------------------------------------------------------------------------\n# response.optimize_css = \'concat,minify,inline\'\n# response.optimize_js = \'concat,minify,inline\'\n\n# -------------------------------------------------------------------------\n# (optional) static assets folder versioning\n# -------------------------------------------------------------------------\n# response.static_version = \'0.0.0\'\n\n# -------------------------------------------------------------------------\n# Here is sample code if you need for\n# - email capabilities\n# - authentication (registration, login, logout, ... )\n# - authorization (role based authorization)\n# - services (xml, csv, json, xmlrpc, jsonrpc, amf, rss)\n# - old style crud actions\n# (more options discussed in gluon/tools.py)\n# -------------------------------------------------------------------------\n\nfrom gluon.tools import Auth, Service, PluginManager\n\n# host names must be a list of allowed host names (glob syntax allowed)\nauth = Auth(db, host_names=myconf.get(\'host.names\'))\nservice = Service()\nplugins = PluginManager()\n\n# -------------------------------------------------------------------------\n# create all tables needed by auth if not custom tables\n# -------------------------------------------------------------------------\nauth.define_tables(username=True, signature=False)\n\n# -------------------------------------------------------------------------\n# configure email\n# -------------------------------------------------------------------------\nmail = auth.settings.mailer\nmail.settings.server = \'logging\' if request.is_local else myconf.get(\'smtp.server\')\nmail.settings.sender = myconf.get(\'smtp.sender\')\nmail.settings.login = myconf.get(\'smtp.login\')\nmail.settings.tls = myconf.get(\'smtp.tls\') or False\nmail.settings.ssl = myconf.get(\'smtp.ssl\') or False\n\n# -------------------------------------------------------------------------\n# configure auth policy\n# -------------------------------------------------------------------------\nauth.settings.registration_requires_verification = False\nauth.settings.registration_requires_approval = False\nauth.settings.reset_password_requires_verification = True\n\n# -------------------------------------------------------------------------\n# Define your tables below (or better in another model file) for example\n#\n# >>> db.define_table(\'mytable\', Field(\'myfield\', \'string\'))\n#\n# Fields can be \'string\',\'text\',\'password\',\'integer\',\'double\',\'boolean\'\n#       \'date\',\'time\',\'datetime\',\'blob\',\'upload\', \'reference TABLENAME\'\n# There is an implicit \'id integer autoincrement\' field\n# Consult manual for more options, validators, etc.\n#\n# More API examples for controllers:\n#\n# >>> db.mytable.insert(myfield=\'value\')\n# >>> rows = db(db.mytable.myfield == \'value\').select(db.mytable.ALL)\n# >>> for row in rows: print row.id, row.myfield\n# -------------------------------------------------------------------------\n\n# -------------------------------------------------------------------------\n# after defining tables, uncomment below to enable auditing\n# -------------------------------------------------------------------------\n# auth.enable_record_versioning(db)\n\nenti_leonardo_set = Set()\nenti_leonardo_set.add("Nessuno")\n\nenti_leonardo_set.add("CAMPI BISENZIO - SAS - 103183022")\nenti_leonardo_set.add("CAMPI BISENZIO - ETN - 104715691")\nenti_leonardo_set.add("CAMPI BISENZIO - SSI - 103131261")\n\nenti_leonardo_set.add("LATINA - SAS - 105125426")\nenti_leonardo_set.add("LATINA - ETN - 106825095")\n\nenti_leonardo_set.add("NERVIANO - SAS - 102084090")\nenti_leonardo_set.add("NERVIANO - ETN - 105742618")\nenti_leonardo_set.add("NERVIANO - SSI - 101711562")\n\nenti_leonardo_set.add("CHIETI - SAS - 106824414")\nenti_leonardo_set.add("CHIETI - ETN - 106825079")\nenti_leonardo_set.add("CHIETI - SSI - 106827088")\n\nenti_leonardo_set.add("L\'AQUILA - SAS - 104427262")\n\n\ndb.define_table(\'enti_leonardo\',Field(\'ente\',requires = IS_IN_SET(enti_leonardo_set),default=\'Nessuno\'))\ndb(db.enti_leonardo).delete()\nfor e in enti_leonardo_set:\n    db.enti_leonardo.insert(ente=e)\n\n\n\ndb.define_table(\'porto\',Field(\'nome\'),migrate=\'porto.table\')\n    \ndb.define_table(\'vettore\',Field(\'nome\'),Field(\'domicilio\'),migrate=\'vettore.table\')\n\ntrasporto_a_mezzo = Set()\ntrasporto_a_mezzo.add("Mittente")\ntrasporto_a_mezzo.add("Destinatario")\ntrasporto_a_mezzo.add("Vettore")\n\nvettori_query = db(db.vettore).select()\nvettori_set = Set()\nfor item in vettori_query:\n    vettori_set.add(item.nome)\n    \n\ndb.define_table(\'codici_pagamenti\',Field(\'descrizione_codice_pagamento\',requires=[IS_NOT_IN_DB(db,\'codici_pagamenti.descrizione_codice_pagamento\')]),Field(\'giorni\',requires=IS_INT_IN_RANGE(0,300)),Field(\'giorni_mese_successivo\',requires=IS_INT_IN_RANGE(0,30)))\n\ncodici_pagamenti_query = db(db.codici_pagamenti).select()\ncodici_pagamenti_set = Set()\nfor item in codici_pagamenti_query:\n    codici_pagamenti_set.add(item.descrizione_codice_pagamento)\n\n\ndb.define_table(\'aspetto_esteriore_dei_beni\',Field(\'nome\'),migrate=\'aspetto_esteriore_dei_beni.table\')\ndb.define_table(\'causali\',Field(\'nome\'),migrate=\'causali.table\')\n\n    \n\ndb.define_table(\'anagrafica_magazzini_interni\',Field(\'nome_magazzino\',requires=[IS_NOT_IN_DB(db,\'anagrafica_magazzini_interni.nome_magazzino\')]))\n\ndb.define_table(\'causali_trasporti\',Field(\'causale\',requires=[IS_NOT_IN_DB(db,\'causali_trasporti.causale\')]))\n\n\ndb.define_table(\'codici_causali\',Field(\'descrizione_codice_causale\',requires=[IS_NOT_IN_DB(db,\'codici_causali.descrizione_codice_causale\')]))\n\ndb.define_table(\'anagrafica_codici_iva\',Field(\'codice_iva\',requires=[IS_NOT_IN_DB(db,\'anagrafica_codici_iva.codice_iva\')]),Field(\'descrizione_codice_iva\',requires=[IS_NOT_EMPTY()]),Field(\'percentuale_iva\',\'float\',requires=[IS_NOT_EMPTY()]),Field(\'bollo_su_importi_esenti\',\'boolean\'),Field(\'descrizione\'))\n\ncodici_iva_query = db(db.anagrafica_codici_iva.codice_iva).select()\ncodici_iva_set = Set()\nfor item in codici_iva_query:\n    codici_iva_set.add(item.descrizione_codice_iva)\n\n    \ncausali_trasporti = db(db.causali_trasporti).select()\ncausali_trasporti_set = Set()\nfor item in causali_trasporti:\n    causali_trasporti_set.add(item.causale)\n    \n\ndb.define_table(\'anagrafica_piano_dei_conti\',Field(\'codice_piano_dei_conti\',requires=[IS_NOT_IN_DB(db,\'anagrafica_piano_dei_conti.codice_piano_dei_conti\')]),Field(\'descrizione_codice\',requires=[IS_NOT_EMPTY()]))\n\nanagrafica_codici_piano_dei_conti_query = db(db.anagrafica_piano_dei_conti.codice_piano_dei_conti).select()\nanagrafica_codici_piano_dei_conti_set = Set()\nfor item in anagrafica_codici_piano_dei_conti_query:\n    anagrafica_codici_piano_dei_conti_set.add(item.codice_piano_dei_conti)\n\nanagrafica_codici_piano_dei_sottoconti_query = db(db.anagrafica_piano_dei_conti.codice_piano_dei_conti).select()\nanagrafica_codici_piano_dei_sottoconti_set = Set()\nfor item in anagrafica_codici_piano_dei_sottoconti_query:\n    if not item.codice_piano_dei_conti[-1:] == \'0\':\n        anagrafica_codici_piano_dei_sottoconti_set.add(item.codice_piano_dei_conti)\n\ndb.define_table(\'anagrafica_banche\',Field(\'descrizione\',requires=IS_NOT_EMPTY()),Field(\'indirizzo\',requires=IS_NOT_EMPTY()),Field(\'cap\',requires=IS_NOT_EMPTY()),Field(\'citta\',rname=\'citt\xc3\xa0\',requires=IS_NOT_EMPTY()),Field(\'provincia\',requires=IS_NOT_EMPTY()),Field(\'codice_sottoconto\',requires=IS_IN_SET(anagrafica_codici_piano_dei_sottoconti_set)),Field(\'descrizione_sottoconto\'),Field(\'codice_abi\'),Field(\'codice_cab\'),Field(\'iban\'))\n\ndb.define_table(\'anagrafica_banche_azienda\',Field(\'descrizione\',requires=IS_NOT_EMPTY()),Field(\'indirizzo\',requires=IS_NOT_EMPTY()),Field(\'cap\',requires=IS_NOT_EMPTY()),Field(\'citta\',rname=\'citt\xc3\xa0\',requires=IS_NOT_EMPTY()),Field(\'provincia\',requires=IS_NOT_EMPTY()),Field(\'codice_sottoconto\',requires=IS_IN_SET(anagrafica_codici_piano_dei_sottoconti_set)),Field(\'descrizione_sottoconto\'),Field(\'codice_abi\'),Field(\'codice_cab\'),Field(\'iban\'))\n\nanagrafica_banche_query = db(db.anagrafica_banche).select()\nanagrafica_banche_set = Set()\nfor item in anagrafica_banche_query:\n    anagrafica_banche_set.add(item.descrizione)\n\n\n\nsex = Set()\nsex.add("M")\nsex.add("F")\n\nfatturazione_set = Set()\nfatturazione_set.add("Riepilogativa")\nfatturazione_set.add("Singola")\n\ncash_flow_set = Set()\ncash_flow_set.add("Manuale")\ncash_flow_set.add("Automatico")\ncash_flow_set.add("Non gestito")\n\npartita_set = Set()\npartita_set.add("Gestite")\npartita_set.add("Non gestite")\n\n\ntrasporto_a_mezzo = Set()\ntrasporto_a_mezzo.add("Mittente")\ntrasporto_a_mezzo.add("Destinatario")\ntrasporto_a_mezzo.add("Vettore")\n\n\nct = db(db.causali).select()\ncausale_trasporto = Set()\nfor item in ct:\n    print item\n    causale_trasporto.add(item.nome)\n    \n    \n#Field(\'date_made\', \'datetime\', default=request.now, format=(\'%d/%m/%Y\'))\n\n\ndb.define_table(\'ddt_clienti\',Field(\'codice_ordine\',requires=[IS_NOT_IN_DB(db,\'ddt_clienti.codice_ordine\')]),Field(\'trasporto_a_mezzo\',requires=IS_IN_SET(trasporto_a_mezzo)),Field(\'causale_del_trasporto\',requires=IS_IN_SET(causale_trasporto)),Field(\'inizio_del_trasporto\', \'datetime\', requires=IS_EMPTY_OR(IS_DATE(format=(\'%d/%m/%Y\')))),Field(\'ditta_vettore\'),Field(\'domicilio_vettore\'),Field(\'data_e_ora_del_ritiro\', \'datetime\', requires=IS_EMPTY_OR(IS_DATE(format=(\'%d/%m/%Y\')))))\n\n\n\n\n\n\n\ncodici_pagamenti_query = db(db.codici_pagamenti.descrizione_codice_pagamento).select()\ncodici_pagamenti_set = Set()\nfor item in codici_pagamenti_query:\n    codici_pagamenti_set.add(item.descrizione_codice_pagamento)\n\ncodici_causali_query = db(db.codici_causali.descrizione_codice_causale).select()\ncodici_causali_set = Set()\nfor item in codici_causali_query:\n    codici_causali_set.add(item.descrizione_codice_causale)\n\nmy_porto= db(db.porto).select()\nmy_porto_set = Set()\nfor item in my_porto:\n    my_porto_set.add(item[\'nome\'])\n\n\ndb.define_table(\'clienti\',Field(\'nome\',requires=[IS_NOT_IN_DB(db,\'clienti.nome\')]),Field(\'citta\'),Field(\'indirizzo\'),Field(\'cap\'),Field(\'provincia\'),Field(\'nazione\'),Field(\'codice_fiscale\'),Field(\'partita_iva\',requires=IS_NOT_EMPTY()),Field(\'telefono\'),Field(\'fax\'),Field(\'cellulare\'),Field(\'email\',requires=[IS_EMAIL()]),Field(\'luogo_consegna_1\'),Field(\'luogo_consegna_2\'),Field(\'luogo_consegna_3\'),Field(\'luogo_consegna_4\'),Field(\'luogo_consegna_5\'),Field(\'luogo_consegna_6\'),Field(\'codice_sottoconto\',requires=IS_IN_SET(anagrafica_codici_piano_dei_conti_set)),Field(\'persona_fisica\',\'boolean\',default=\'False\'),Field(\'nato_a\'),Field(\'data_nascita\'),Field(\'provincia_nascita\'),Field(\'sesso\'),Field(\'codice_iva\',requires=IS_IN_SET(codici_iva_set)),Field(\'descrizione_esenzione_iva\'),Field(\'codice_banca\',requires=IS_IN_SET(anagrafica_banche_set)),Field(\'codice_iban\'),Field(\'fatturazione\',requires=IS_IN_SET(fatturazione_set)),Field(\'cash_flow\',requires=IS_IN_SET(cash_flow_set)),Field(\'partita\',requires=IS_IN_SET(partita_set)),Field(\'pagamento\',requires=IS_IN_SET(codici_pagamenti_set)),Field(\'annotazioni\',default=\'\'),Field(\'causale_trasporto\',requires=IS_IN_SET(causale_trasporto)),Field(\'trasporto_a_mezzo\',requires=IS_IN_SET(trasporto_a_mezzo)),Field(\'porto\',requires=IS_IN_SET(my_porto_set)),Field(\'vettore\',requires=IS_IN_SET(vettori_set)),Field(\'codiceDestinatario\'),Field(\'pec\'))\n\ndb.define_table(\'fornitori\',Field(\'nome\',requires=[IS_NOT_IN_DB(db,\'fornitori.nome\')]),Field(\'citta\'),Field(\'indirizzo\'),Field(\'cap\'),Field(\'provincia\'),Field(\'nazione\'),Field(\'codice_fiscale\'),Field(\'partita_iva\',requires=IS_NOT_EMPTY()),Field(\'telefono\'),Field(\'fax\'),Field(\'cellulare\'),Field(\'email\',requires=[IS_EMAIL()]),Field(\'luogo_consegna_1\'),Field(\'luogo_consegna_2\'),Field(\'codice_sottoconto\',requires=IS_IN_SET(anagrafica_codici_piano_dei_conti_set)),Field(\'persona_fisica\',\'boolean\',default=\'False\'),Field(\'nato_a\'),Field(\'data_nascita\'),Field(\'provincia_nascita\'),Field(\'sesso\'),Field(\'codice_iva\',requires=IS_IN_SET(codici_iva_set)),Field(\'descrizione_esenzione_iva\'),Field(\'codice_banca\',requires=IS_IN_SET(anagrafica_banche_set)),Field(\'codice_iban\'),Field(\'fatturazione\',requires=IS_IN_SET(fatturazione_set)),Field(\'cash_flow\',requires=IS_IN_SET(cash_flow_set)),Field(\'partita\',requires=IS_IN_SET(partita_set)),Field(\'pagamento\',requires=IS_IN_SET(codici_pagamenti_set)),Field(\'codiceDestinatario\'),Field(\'pec\'))\n\nmy_clients= db(db.clienti.nome).select()\nmy_clients_set = Set()\nfor item in my_clients:\n    my_clients_set.add(item[\'nome\'])\n    \nmy_fornitori= db(db.fornitori.nome).select()\nmy_fornitori_set = Set()\nfor item in my_fornitori:\n    my_fornitori_set.add(item[\'nome\'])\n\n\n\ndb.define_table(\'ddt_cliente\',Field(\'nome_cliente\',requires=IS_IN_SET(my_clients_set)),Field(\'trasporto_a_mezzo\',requires=IS_IN_SET(trasporto_a_mezzo)),Field(\'causale_del_trasporto\',requires=IS_IN_SET(causale_trasporto)),Field(\'inizio_del_trasporto\', \'datetime\', requires=IS_EMPTY_OR(IS_DATE(format=(\'%d/%m/%Y\')))),Field(\'ditta_vettore\'),Field(\'domicilio_vettore\'),Field(\'data_e_ora_del_ritiro\', \'datetime\', requires=IS_EMPTY_OR(IS_DATE(format=(\'%d/%m/%Y\')))),Field(\'id_cliente\'),Field(\'data_richiesta\',\'datetime\', default = request.now, requires = IS_DATE(format=(\'%d/%m/%Y\'))),Field(\'numero_ddt\'),Field(\'fattura_emessa\',\'boolean\',default=False,notnull=True),Field(\'porto\'),Field(\'peso\'),Field(\'aspetto\'),Field(\'annotazioni\'),Field(\'user_id\'),Field(\'consegna\',rname=\'consegna\'),migrate=\'ddt_cliente.table\')\n\ndb.define_table(\'ddt_fornitore\',Field(\'nome_fornitore\',requires=IS_IN_SET(my_fornitori_set)),Field(\'trasporto_a_mezzo\',requires=IS_IN_SET(trasporto_a_mezzo)),Field(\'causale_del_trasporto\',requires=IS_IN_SET(causale_trasporto)),Field(\'inizio_del_trasporto\', \'datetime\', requires=IS_EMPTY_OR(IS_DATE(format=(\'%d/%m/%Y\')))),Field(\'ditta_vettore\'),Field(\'domicilio_vettore\'),Field(\'data_e_ora_del_ritiro\', \'datetime\', requires=IS_EMPTY_OR(IS_DATE(format=(\'%d/%m/%Y\')))),Field(\'id_fornitore\'),Field(\'data_richiesta\',\'datetime\', default = request.now, requires = IS_DATE(format=(\'%d/%m/%Y\'))),Field(\'numero_ddt\'),Field(\'porto\'),Field(\'peso\'),Field(\'aspetto\'),Field(\'annotazioni\'),Field(\'user_id\'),migrate=\'ddt_fornitore.table\')\n\n\ndb.define_table(\'fattura_cliente\',Field(\'nome_cliente\',requires=IS_IN_SET(my_clients_set)),Field(\'dal\',\'datetime\',requires=IS_DATE(format="%d/%m/%Y")),Field(\'al\',\'datetime\',requires=IS_DATE(format="%d/%m/%Y")),Field(\'numero_fattura\'),Field(\'id_cliente\'),migrate=\'fattura_cliente.table\')\n\ntipologia_listini_set = Set()\ntipologia_listini_set.add("Cliente")\ntipologia_listini_set.add("Fornitore")\n\nlistini_set = my_clients_set.union(my_fornitori_set)\ndb.define_table(\'anagrafica_listini\',Field(\'nome_cliente\',requires=IS_IN_SET(listini_set)),Field(\'nome_listino\',requires=IS_NOT_EMPTY()),Field(\'tipologia_listino\',requires=IS_IN_SET(tipologia_listini_set)))\n\n"""\n#db.define_table(\'ordini_clienti\',Field(\'nome_cliente\',requires=IS_IN_SET(my_clients_set)),\n\ndb.define_table(\'articoli\',Field(\'anagrafica_articoli_id\'),Field(\'codice_articolo\',requires=IS_NOT_IN_DB(db,\'articoli.codice_articolo\')),Field(\'descrizione_articolo\',requires=IS_NOT_EMPTY()),Field(\'numero_pezzi_1\',requires=IS_NOT_EMPTY()),Field(\'prezzo_per_numero_pezzi_1\',requires=IS_NOT_EMPTY()),Field(\'data_inserimento_1\',\'datetime\'),Field(\'numero_pezzi_2\'),Field(\'prezzo_per_numero_pezzi_2\'),Field(\'data_inserimento_2\',\'datetime\'),Field(\'numero_pezzi_3\'),Field(\'prezzo_per_numero_pezzi_3\'),Field(\'data_inserimento_3\',\'datetime\'),Field(\'numero_pezzi_4\'),Field(\'prezzo_per_numero_pezzi_4\'),Field(\'data_inserimento_4\',\'datetime\'),Field(\'numero_pezzi_5\'),Field(\'prezzo_per_numero_pezzi_5\'),Field(\'data_inserimento_5\',\'datetime\'),Field(\'numero_pezzi_6\'),Field(\'prezzo_per_numero_pezzi_6\'),Field(\'data_inserimento_6\',\'datetime\'))\n\n"""\n\n"""\nMagazzini interni\n"""\n\nmy_magazzini_interni= db(db.anagrafica_magazzini_interni.nome_magazzino).select()\nmy_magazzini_interni_set = Set()\nfor item in my_magazzini_interni:\n    my_magazzini_interni_set.add(item[\'nome_magazzino\'])\n\n\n\nmy_listini= db(db.anagrafica_listini.nome_listino).select()\nmy_listini_set = Set()\nfor item in my_listini:\n    my_listini_set.add(item[\'nome_listino\'])\n\n\n\n\ndb.define_table(\'numero_ordine_cliente_progressivo\',Field(\'ultimo_codice_ordine\'))\ndb.define_table(\'numero_ordine_fornitore_progressivo\',Field(\'ultimo_codice_ordine\'),migrate=\'numero_ordine_fornitore_progressivo.table\')\n\n\n\ndb.define_table(\'ordine_cliente\',Field(\'ultimo_codice_ordine\'),Field(\'nome_cliente\',requires=IS_IN_SET(my_clients_set)),Field(\'data_inserimento\',\'datetime\',requires = IS_DATE(format=(\'%d/%m/%Y\'))),Field(\'listino\',requires=IS_IN_SET(my_listini_set)),Field(\'riferimento_ordine_cliente\'),Field(\'data_ordine_cliente\',\'datetime\',requires = IS_DATE(format=(\'%d/%m/%Y\'))),Field(\'magazzino_interno\',requires=IS_IN_SET(my_magazzini_interni_set)),Field(\'id_cliente\'),Field(\'ddt_completato\',\'boolean\',default = False),Field(\'pagamento\',requires=IS_IN_SET(codici_pagamenti_set)),Field(\'ente\',requires=IS_IN_SET(enti_leonardo_set),default=\'Nessuno\'))\n\n\n\n\n\n\n\ndb.define_table(\'ordine_fornitore\',Field(\'ultimo_codice_ordine\'),Field(\'nome_fornitore\',requires=IS_IN_SET(my_fornitori_set)),Field(\'data_inserimento\',\'datetime\',requires = IS_DATE(format=(\'%d/%m/%Y\'))),Field(\'listino\',requires=IS_IN_SET(my_listini_set)),Field(\'riferimento_ordine_cliente\'),Field(\'data_ordine_fornitore\',\'datetime\',requires = IS_DATE(format=(\'%d/%m/%Y\'))),Field(\'magazzino_interno\',requires=IS_IN_SET(my_magazzini_interni_set)),Field(\'id_fornitore\'),Field(\'ddt_completato\',\'boolean\',default = False),Field(\'pagamento\',requires=IS_IN_SET(codici_pagamenti_set)),Field(\'trasporto_a_mezzo\',requires=IS_IN_SET(trasporto_a_mezzo)),Field(\'porto\',requires=IS_IN_SET(my_porto_set)),Field(\'vettore\',requires=IS_IN_SET(vettori_set)),migrate=\'ordine_fornitore.table\')\n\ndb.define_table(\'righe_in_ordine_cliente\',Field(\'id_ordine_cliente\'),Field(\'n_riga\'),Field(\'codice_articolo\'),Field(\'quantita\'),Field(\'prezzo\'),Field(\'sconti\'),Field(\'codice_iva\',requires=IS_IN_SET(codici_iva_set)),Field(\'evasione\',\'datetime\',requires = IS_DATE(format=(\'%d/%m/%Y\'))),Field(\'riga_emessa_in_ddt\',\'boolean\',default = False),Field(\'commento\'))\n\n\ndb.define_table(\'righe_in_ordine_fornitore\',Field(\'id_ordine_fornitore\'),Field(\'n_riga\'),Field(\'codice_articolo\'),Field(\'quantita\'),Field(\'prezzo\'),Field(\'sconti\'),Field(\'codice_iva\',requires=IS_IN_SET(codici_iva_set)),Field(\'evasione\',\'datetime\',requires = IS_DATE(format=(\'%d/%m/%Y\'))),Field(\'riga_emessa_in_ddt\',\'boolean\',default = False),Field(\'commento\'),migrate=\'righe_in_ordine_fornitore.table\')\n\ndb.define_table(\'righe_in_ddt_cliente\',Field(\'id_ordine\'),Field(\'codice_ordine\'),Field(\'n_riga\'),Field(\'codice_articolo\'),Field(\'descrizione\'),Field(\'riferimento_ordine\'),Field(\'u_m\',default=\'Nr\'),Field(\'quantita_richiesta\'),Field(\'saldo\'),Field(\'quantita_prodotta\',default = 0),Field(\'prezzo\'),Field(\'sconti\'),Field(\'codice_iva\',requires=IS_IN_SET(codici_iva_set),default="Iva 22%"),Field(\'evasione\',\'datetime\',requires=IS_DATE(format=(\'%d/%m/%Y\'))),Field(\'user_id\'),Field(\'id_riga_ordine\'),migrate=\'righe_in_ddt_cliente.table\')\n\ndb.define_table(\'righe_in_ddt_fornitore\',Field(\'id_ordine\'),Field(\'codice_ordine\'),Field(\'n_riga\'),Field(\'codice_articolo\'),Field(\'descrizione\'),Field(\'riferimento_ordine\'),Field(\'u_m\',default=\'Nr\'),Field(\'quantita\'),Field(\'prezzo\'),Field(\'sconti\'),Field(\'codice_iva\',requires=IS_IN_SET(codici_iva_set),default="Iva 22%"),Field(\'evasione\',\'datetime\'),Field(\'user_id\'))\n\n\ndb.define_table(\'ddt_da_fatturare\',Field("numero_ddt"),Field(\'ddt_id\'),Field(\'data_emissione\'),Field(\'user_id\'),Field(\'totale\'),migrate=\'ddt_da_fatturare.table\')\n\ndb.define_table(\'saved_ddt\',Field(\'saved_ddt_id\'),Field(\'data_inserimento\'),Field(\'numero_ddt\'),Field(\'user_id\'),migrate=\'saved_ddt.table\')\n\ndb.define_table(\'saved_ddt_fornitori\',Field(\'saved_ddt_id\'),Field(\'data_inserimento\'),Field(\'numero_ddt\'),Field(\'user_id\'),migrate=\'saved_ddt_fornitori.table\')\n\ndb.define_table(\'saved_righe_in_ddt_cliente\',Field(\'saved_ddt_id\'),Field(\'id_ordine\'),Field(\'codice_ordine\'),Field(\'n_riga\'),Field(\'codice_articolo\'),Field(\'descrizione\'),Field(\'riferimento_ordine\'),Field(\'u_m\',default=\'Nr\'),Field(\'quantita\'),Field(\'prezzo\'),Field(\'sconti\'),Field(\'codice_iva\',requires=IS_IN_SET(codici_iva_set),default="Iva 22%"),Field(\'evasione\',\'datetime\'),Field(\'user_id\'),Field(\'id_riga_ordine\'))\ndb.define_table(\'saved_righe_in_ddt_cliente_undo\',Field(\'saved_ddt_id\'),Field(\'id_ordine\'),Field(\'codice_ordine\'),Field(\'n_riga\'),Field(\'codice_articolo\'),Field(\'descrizione\'),Field(\'riferimento_ordine\'),Field(\'u_m\',default=\'Nr\'),Field(\'quantita\'),Field(\'prezzo\'),Field(\'sconti\'),Field(\'codice_iva\',requires=IS_IN_SET(codici_iva_set),default="Iva 22%"),Field(\'evasione\',\'datetime\'),Field(\'user_id\'),Field(\'id_riga_ordine\'))\n\n\ndb.define_table(\'saved_righe_in_ddt_fornitore\',Field(\'saved_ddt_id\'),Field(\'id_ordine\'),Field(\'codice_ordine\'),Field(\'n_riga\'),Field(\'codice_articolo\'),Field(\'descrizione\'),Field(\'riferimento_ordine\'),Field(\'u_m\',default=\'Nr\'),Field(\'quantita\'),Field(\'prezzo\'),Field(\'sconti\'),Field(\'codice_iva\',requires=IS_IN_SET(codici_iva_set),default="Iva 22%"),Field(\'evasione\',\'datetime\'),Field(\'user_id\'))\n\n\ndb.define_table(\'righe_in_fattura_istantanea\',Field(\'codice_articolo\'),Field(\'descrizione\'),Field(\'riferimento_ordine\'),Field(\'u_m\',default=\'Nr\'),Field(\'qta\'),Field(\'prezzo\'),Field(\'sconti\'),Field(\'codice_iva\',requires=IS_IN_SET(codici_iva_set),default="Iva 22%"),Field(\'commento\'))\n\ndb.define_table(\'fattura\',Field(\'numero_fattura\'),migrate=\'fattura.table\')\ndb.define_table(\'ddt\',Field(\'numero_ddt\'))\n\ndb.define_table(\'bolli\',Field(\'descrizione\'),Field(\'valore\'),migrate=\'db.bolli.table\')\n\n\ndb.define_table(\'storico_articoli_prodotti\',Field(\'cliente\'),Field(\'codice_ordine\'),Field(\'n_riga\'),Field(\'codice_articolo\'),Field(\'descrizione\'),Field(\'riferimento_ordine\'),Field(\'ddt\'),Field(\'quantita\'),Field(\'prezzo\'),Field(\'codice_iva\',requires=IS_IN_SET(codici_iva_set),default="Iva 22%"),Field(\'evasione\',\'datetime\',requires = IS_DATE(format=(\'%d/%m/%Y\'))),migrate=\'storico_articoli_prodotti.table\')\n\nsezione_bilancio_set = Set()\nsezione_bilancio_set.add("Attivit\xc3\xa0")\nsezione_bilancio_set.add("Passivit\xc3\xa0")\nsezione_bilancio_set.add("Ordine")\nsezione_bilancio_set.add("Costi")\nsezione_bilancio_set.add("Ricavi")\n\n\ntipo_sottoconto_set = Set()\ntipo_sottoconto_set.add("Nessuno")\ntipo_sottoconto_set.add("Clienti")\ntipo_sottoconto_set.add("Fornitori")\ntipo_sottoconto_set.add("Iva")\ntipo_sottoconto_set.add("Magazzino")\ntipo_sottoconto_set.add("Banche")\ntipo_sottoconto_set.add("Riepilogo")\ntipo_sottoconto_set.add("Vendite corrispettivi")\ntipo_sottoconto_set.add("Ammortamenti")\ntipo_sottoconto_set.add("Generico")\n\ntipo_ordine_set = Set()\ntipo_ordine_set.add("Ordine acquisto")\ntipo_ordine_set.add("Call off")\ntipo_ordine_set.add("Annulato")\ntipo_ordine_set.add("Mai prodotto")\ntipo_ordine_set.add("Ordine di conto lavoro")\ntipo_ordine_set.add("Ordine prototipo")\ntipo_ordine_set.add("Fuori produzione")\ntipo_ordine_set.add("Da modificare")\ntipo_ordine_set.add("Difficolt\xc3\xa0 di produzione")\ntipo_ordine_set.add("Kanban")\n\ntipo_trattamento_set = Set()\ntipo_trattamento_set.add("Si")\ntipo_trattamento_set.add("No")\ntipo_trattamento_set.add("Vedi ordine cliente")\n\ntipo_articolo_set = Set()\ntipo_articolo_set.add("Prodotto finito")\ntipo_articolo_set.add("Semilavorato")\ntipo_articolo_set.add("Aggregato")\ntipo_articolo_set.add("Materia prima")\ntipo_articolo_set.add("Materiale ausiliario")\ntipo_articolo_set.add("Materiale di consumo")\n\n\ndb.define_table(\'anagrafica_articoli\',Field(\'codice_articolo\',requires=IS_NOT_IN_DB(db,\'anagrafica_articoli.codice_articolo\')),Field(\'giacenza\',requires=IS_INT_IN_RANGE(0,999999)),Field(\'descrizione\'),Field(\'revisione\'),Field(\'ubicazione\'),Field(\'cartella_disegno\'),Field(\'tipo_articolo\',requires = IS_IN_SET(tipo_articolo_set)),Field(\'segnala_prime_tre_produzioni\',\'boolean\'),Field(\'codice_iva\',requires = IS_IN_SET(codici_iva_set)),Field(\'trattamento\',requires = IS_IN_SET(tipo_trattamento_set)),Field(\'tipo_lamiera\'),Field(\'tipo_ordine\',requires=IS_IN_SET(tipo_ordine_set)),Field(\'codice_sottoconto\',requires=IS_IN_SET(anagrafica_codici_piano_dei_sottoconti_set)),Field(\'free_pass\',\'boolean\'),Field(\'codice_imballo\'),Field(\'descrizione_imballo\'))\n\n\n\n\ndb.define_table(\'piano_dei_conti\',Field(\'codice_gruppo\'),Field(\'descrizione_gruppo\'),Field(\'codice_conto\'),Field(\'descrizione_conto\'),Field(\'codice_sottoconto\'),Field(\'descrizione_sottoconto\'),Field(\'sezione_bilancio\',requires=IS_IN_SET(sezione_bilancio_set)),Field(\'tipo_sottoconto\',requires=IS_IN_SET(tipo_sottoconto_set)))\n\n\ndb.define_table(\'articolo_in_listino\',Field(\'nome_cliente\',requires=IS_IN_SET(my_clients_set)),Field(\'listino\',requires=IS_IN_SET(my_listini_set)),Field(\'id_articolo\'),Field(\'codice_articolo\'),Field(\'data_valuta\',\'datetime\'),Field(\'numero_pezzi\'),Field(\'prezzo\'),Field(\'note\'),Field(\'variazione\'))\n\ndb.define_table(\'articolo_in_listino_fornitori\',Field(\'nome_fornitore\',requires=IS_IN_SET(my_fornitori_set)),Field(\'listino\',requires=IS_IN_SET(my_listini_set)),Field(\'id_articolo\'),Field(\'codice_articolo\'),Field(\'data_valuta\',\'datetime\',requires=IS_DATE(format=\'%d/%m/%Y\')),Field(\'numero_pezzi\'),Field(\'prezzo\'),Field(\'note\'),Field(\'variazione\'),migrate=\'articolo_in_listino_fornitori.table\')\n\n\ndb.define_table(\'contabili_cc\',Field(\'cliente\',requires=[IS_IN_SET(my_clients_set)]),Field(\'indirizzo\'),Field(\'cap\'),Field(\'provincia\'),Field(\'nazione\'),Field(\'codice_fiscale\'),Field(\'partita_iva\'),Field(\'telefono\'),Field(\'fax\'),Field(\'cellulare\'),Field(\'email\',requires=[IS_EMAIL()]),Field(\'persona_fisica\',\'boolean\',default=\'False\'),Field(\'nato_a\'),Field(\'data_nascita\',\'datetime\',requires=[IS_DATE(format=(\'%d/%m/%Y\'))]),Field(\'provincia_nascita\'),Field(\'sesso\',requires=IS_IN_SET(sex)))\n\ndb.define_table(\'produzione_righe_per_ddt\',Field(\'id_riga_ordine\'),Field(\'quantita_prodotta\'),migrate=\'produzione_righe_per_ddt.table\')\n\ndb.define_table(\'fatture_salvate\',Field(\'data_fattura\',\'datetime\',requires=IS_DATE(format=\'%d/%m/%Y\')),Field(\'numero_fattura\'),Field(\'id_cliente\'),Field(\'id_ddt\'),Field(\'totale\'),Field(\'nome_cliente\'),Field(\'scadenza\',\'datetime\',requires=IS_DATE(format=\'%d/%m/%Y\')),Field(\'richiede_riba\',\'boolean\',default=\'F\'),Field(\'riba_emessa\',\'boolean\',default=\'F\'),Field(\'user_id\'),migrate="fatture_salvate.table")\ndb.define_table(\'riba_emesse\',Field(\'id_fattura\'),Field(\'id_cliente\'),Field(\'totale\'),Field(\'nome_cliente\'),Field(\'pagamento\'),Field(\'scadenza\',\'datetime\'))\n\ndb.define_table(\'fatture_scelte\',Field(\'id_fattura\'),Field(\'numero_fattura\'),Field(\'totale\'),Field(\'user_id\'),Field(\'cliente\'),Field(\'accorpa\',\'boolean\'),Field(\'id_cliente\'),Field(\'scadenza\',\'datetime\',requires=IS_DATE(format=\'%d/%m/%Y\')))\n\n\n\ndb.define_table(\'riserva_quantita\',Field(\'codice_articolo\'),Field(\'quantita\'),Field(\'id_riga_ordine\'),Field(\'user_id\'),Field(\'data_richiesta\',\'datetime\',requires=[IS_NOT_EMPTY(),IS_DATE(format=(\'%d-%m-%Y h:m\'))],default=lambda:datetime.datetime.now()))\ndb.define_table(\'scadenziario\',Field(\'data_consegna\',\'datetime\',requires=IS_DATE(format=\'%d/%m/%Y\')),Field(\'cliente\'),Field(\'riferimento_ordine\'),Field(\'codice_ordine\'),Field(\'codice_articolo\'),Field(\'descrizione\'),Field(\'qta_ordine\',requires=IS_INT_IN_RANGE(0,999999)),Field(\'qta_saldo\',requires=IS_INT_IN_RANGE(0,999999)),Field(\'prezzo\'),Field("id_riga"),migrate=\'scadenziario.table\')\n\ndb.define_table(\'totali_ddt_mese_\',Field(\'cliente\'),Field(\'totale\'))\ndb.define_table(\'totali_ddt_anno_\',Field(\'destinazione\'),Field(\'totale\'),migrate=\'totali_ddt_anno_.table\')\n\ndb.define_table(\'errori\',Field(\'tipo_errore\'))\ndb.define_table(\'temp_banca\',Field(\'banca\'))\ndb.define_table(\'numero_disposizioni_riba\',Field(\'numero\'))\n\ndb.define_table(\'articoli_in_produzione\',Field(\'data_consegna\',\'datetime\',requires=IS_DATE(format=\'%d/%m/%Y\')),Field(\'cliente\'),Field(\'riferimento_ordine\'),Field(\'codice_ordine\'),Field(\'codice_articolo\'),Field(\'descrizione\'),Field(\'qta_ordine\',requires=IS_INT_IN_RANGE(0,999999)),Field(\'qta_saldo\',requires=IS_INT_IN_RANGE(0,999999)),Field(\'prezzo\'),Field("id_riga"),migrate=\'articoli_in_produzione.table\')\ndb.define_table(\'lavorazioni\',Field(\'nome\'),Field(\'controllo\'))\n\n\n\n\n\ndb.define_table(\'lista_lavorazioni_per_articolo\',\n                Field(\'codice_articolo\'),\n                Field(\'json_dettaglio\',type=\'json\'),migrate=\'tablename.table\')\n\n\n\ndb.define_table(\'storico_articoli_prodotti_fornitore\',Field(\'fornitore\'),Field(\'codice_ordine\'),Field(\'n_riga\'),Field(\'codice_articolo\'),Field(\'descrizione\'),Field(\'riferimento_ordine\'),Field(\'ddt\'),Field(\'quantita\'),Field(\'prezzo\'),Field(\'codice_iva\',requires=IS_IN_SET(codici_iva_set),default="Iva 22%"),Field(\'evasione\',\'datetime\',requires = IS_DATE(format=(\'%d/%m/%Y\'))),migrate=\'storico_articoli_prodotti_fornitore.table\')\n\n\n\n'
+p7
+sS'snapshot'
+p8
+(dp9
+S'exception'
+p10
+(dp11
+S'__module__'
+p12
+S"'pymysql.err'"
+p13
+sS'__getslice__'
+p14
+S"<method-wrapper '__getslice__' of InternalError object>"
+p15
+sS'__str__'
+p16
+S"<method-wrapper '__str__' of InternalError object>"
+p17
+sS'__reduce__'
+p18
+S'<built-in method __reduce__ of InternalError object>'
+p19
+sS'__dict__'
+p20
+S'{}'
+p21
+sS'__sizeof__'
+p22
+S'<built-in method __sizeof__ of InternalError object>'
+p23
+sS'__weakref__'
+p24
+S'None'
+p25
+sS'__init__'
+p26
+S"<method-wrapper '__init__' of InternalError object>"
+p27
+sS'__setattr__'
+p28
+S"<method-wrapper '__setattr__' of InternalError object>"
+p29
+sS'__reduce_ex__'
+p30
+S'<built-in method __reduce_ex__ of InternalError object>'
+p31
+sS'__new__'
+p32
+S'<built-in method __new__ of type object>'
+p33
+sS'__format__'
+p34
+S'<built-in method __format__ of InternalError object>'
+p35
+sS'__class__'
+p36
+S"<class 'pymysql.err.InternalError'>"
+p37
+sS'__doc__'
+p38
+S"'Exception raised when the database encounters an...anymore, the transaction is\\n    out of sync, etc.'"
+p39
+sS'__getitem__'
+p40
+S"<method-wrapper '__getitem__' of InternalError object>"
+p41
+sS'__setstate__'
+p42
+S'<built-in method __setstate__ of InternalError object>'
+p43
+sS'__getattribute__'
+p44
+S"<method-wrapper '__getattribute__' of InternalError object>"
+p45
+sS'args'
+p46
+S"(1205, u'Lock wait timeout exceeded; try restarting transaction')"
+p47
+sS'__subclasshook__'
+p48
+S'<built-in method __subclasshook__ of type object>'
+p49
+sS'__unicode__'
+p50
+S'<built-in method __unicode__ of InternalError object>'
+p51
+sS'__delattr__'
+p52
+S"<method-wrapper '__delattr__' of InternalError object>"
+p53
+sS'__repr__'
+p54
+S"<method-wrapper '__repr__' of InternalError object>"
+p55
+sS'__hash__'
+p56
+S"<method-wrapper '__hash__' of InternalError object>"
+p57
+ssS'evalue'
+p58
+S"(1205, u'Lock wait timeout exceeded; try restarting transaction')"
+p59
+sS'request'
+p60
+cgluon.html
+XML_unpickle
+p61
+(S's\xc1N\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">ajax</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">application</td><td style="vertical-align:top;">:</td><td><div>gestionale</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cid</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">client</td><td style="vertical-align:top;">:</td><td><div>192.168.0.177</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">controller</td><td style="vertical-align:top;">:</td><td><div>default</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">session_id_gestionale</td><td style="vertical-align:top;">:</td><td><div>192.168.0.177-83e5cc6c-db02-4e7d-b4a9-1832f9855945<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">env</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT</td><td style="vertical-align:top;">:</td><td><div>text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_ENCODING</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate, sdch</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_LANGUAGE</td><td style="vertical-align:top;">:</td><td><div>it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_CONNECTION</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_COOKIE</td><td style="vertical-align:top;">:</td><td><div>session_id_gestionale=192.168.0.177-83e5cc6c-db02-4e7d-b4a9-1832f9855945</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_HOST</td><td style="vertical-align:top;">:</td><td><div>192.168.0.4:8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_UPGRADE_INSECURE_REQUESTS</td><td style="vertical-align:top;">:</td><td><div>1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_USER_AGENT</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">PATH_INFO</td><td style="vertical-align:top;">:</td><td><div>/gestionale</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">QUERY_STRING</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_ADDR</td><td style="vertical-align:top;">:</td><td><div>192.168.0.177</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_PORT</td><td style="vertical-align:top;">:</td><td><div>2793</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REQUEST_METHOD</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SCRIPT_NAME</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_NAME</td><td style="vertical-align:top;">:</td><td><div>SRV-ESOLVER</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PORT</td><td style="vertical-align:top;">:</td><td><div>8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PROTOCOL</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_SOFTWARE</td><td style="vertical-align:top;">:</td><td><div>Rocket 1.2.6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;C:\\\\workspace\\\\web2py\\\\applications\\\\gestionale\\\\&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>C:\\workspace\\web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_options</td><td style="vertical-align:top;">:</td><td><div>&lt;Values at 0x2f7aa80: {&#x27;verbose&#x27;: False, &#x27;ip&#x27;: &#x27;192.168.0.4&#x27;, &#x27;debuglevel&#x27;: 30, &#x27;with_scheduler&#x27;: False, &#x27;shutdown_timeout&#x27;: 5, &#x27;taskbar&#x27;: False, &#x27;with_coverage&#x27;: False, &#x27;pid_filename&#x27;: &#x27;httpserver.pid&#x27;, &#x27;maxthreads&#x27;: None, &#x27;softcron&#x27;: False, &#x27;server_name&#x27;: &#x27;SRV-ESOLVER&#x27;, &#x27;bpython&#x27;: False, &#x27;nogui&#x27;: False, &#x27;port&#x27;: 8000, &#x27;print_errors&#x27;: False, &#x27;extcron&#x27;: False, &#x27;runcron&#x27;: False, &#x27;run_system_tests&#x27;: False, &#x27;test&#x27;: None, &#x27;folder&#x27;: &#x27;C:\\\\workspace\\\\web2py&#x27;, &#x27;config&#x27;: &#x27;&#x27;, &#x27;minthreads&#x27;: None, &#x27;shell&#x27;: None, &#x27;run&#x27;: &#x27;&#x27;, &#x27;log_filename&#x27;: &#x27;httpserver.log&#x27;, &#x27;profiler_dir&#x27;: None, &#x27;args&#x27;: [&#x27;&#x27;], &#x27;socket_timeout&#x27;: 5, &#x27;ssl_ca_certificate&#x27;: None, &#x27;scheduler&#x27;: None, &#x27;interfaces&#x27;: None, &#x27;ssl_private_key&#x27;: &#x27;&#x27;, &#x27;gae&#x27;: None, &#x27;password&#x27;: &#x27;******&#x27;, &#x27;request_queue_size&#x27;: 5, &#x27;ssl_certificate&#x27;: &#x27;&#x27;, &#x27;cronjob&#x27;: False, &#x27;numthreads&#x27;: None, &#x27;quiet&#x27;: False, &#x27;import_models&#x27;: False, &#x27;timeout&#x27;: 10, &#x27;plain&#x27;: False, &#x27;nobanner&#x27;: False}&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>C:\\workspace\\web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept</td><td style="vertical-align:top;">:</td><td><div>text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_encoding</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate, sdch</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_language</td><td style="vertical-align:top;">:</td><td><div>it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_connection</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_cookie</td><td style="vertical-align:top;">:</td><td><div>session_id_gestionale=192.168.0.177-83e5cc6c-db02-4e7d-b4a9-1832f9855945</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_host</td><td style="vertical-align:top;">:</td><td><div>192.168.0.4:8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_upgrade_insecure_requests</td><td style="vertical-align:top;">:</td><td><div>1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_user_agent</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>SRV-ESOLVER.DOMAIN.local</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>SRV-ESOLVER</div></td></tr><tr><td><div>192.168.0.4</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path_info</td><td style="vertical-align:top;">:</td><td><div>/gestionale</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">query_string</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_addr</td><td style="vertical-align:top;">:</td><td><div>192.168.0.177</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_port</td><td style="vertical-align:top;">:</td><td><div>2793</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_method</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_uri</td><td style="vertical-align:top;">:</td><td><div>/gestionale</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">script_name</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_name</td><td style="vertical-align:top;">:</td><td><div>SRV-ESOLVER</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_port</td><td style="vertical-align:top;">:</td><td><div>8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_protocol</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_software</td><td style="vertical-align:top;">:</td><td><div>Rocket 1.2.6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_path</td><td style="vertical-align:top;">:</td><td><div>C:\\workspace\\web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.14.6-stable+timestamp.2016.05.10.00.21.47</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;&lt;stderr&gt;&#x27;, mode &#x27;w&#x27; at 0x01E6D0D0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;class wsgiref.util.FileWrapper at 0x02EC3B20&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.input</td><td style="vertical-align:top;">:</td><td><div>&lt;socket._fileobject object at 0x090BDEB0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multiprocess</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multithread</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;&lt;stderr&gt;&#x27;, mode &#x27;w&#x27; at 0x01E6D0D0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;class wsgiref.util.FileWrapper at 0x02EC3B20&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_input</td><td style="vertical-align:top;">:</td><td><div>&lt;socket._fileobject object at 0x090BDEB0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multiprocess</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multithread</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">extension</td><td style="vertical-align:top;">:</td><td><div>html</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">folder</td><td style="vertical-align:top;">:</td><td><div>C:\\workspace\\web2py\\applications\\gestionale\\</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">function</td><td style="vertical-align:top;">:</td><td><div>index</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">global_settings</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;C:\\\\workspace\\\\web2py\\\\applications\\\\gestionale\\\\&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>C:\\workspace\\web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_options</td><td style="vertical-align:top;">:</td><td><div>&lt;Values at 0x2f7aa80: {&#x27;verbose&#x27;: False, &#x27;ip&#x27;: &#x27;192.168.0.4&#x27;, &#x27;debuglevel&#x27;: 30, &#x27;with_scheduler&#x27;: False, &#x27;shutdown_timeout&#x27;: 5, &#x27;taskbar&#x27;: False, &#x27;with_coverage&#x27;: False, &#x27;pid_filename&#x27;: &#x27;httpserver.pid&#x27;, &#x27;maxthreads&#x27;: None, &#x27;softcron&#x27;: False, &#x27;server_name&#x27;: &#x27;SRV-ESOLVER&#x27;, &#x27;bpython&#x27;: False, &#x27;nogui&#x27;: False, &#x27;port&#x27;: 8000, &#x27;print_errors&#x27;: False, &#x27;extcron&#x27;: False, &#x27;runcron&#x27;: False, &#x27;run_system_tests&#x27;: False, &#x27;test&#x27;: None, &#x27;folder&#x27;: &#x27;C:\\\\workspace\\\\web2py&#x27;, &#x27;config&#x27;: &#x27;&#x27;, &#x27;minthreads&#x27;: None, &#x27;shell&#x27;: None, &#x27;run&#x27;: &#x27;&#x27;, &#x27;log_filename&#x27;: &#x27;httpserver.log&#x27;, &#x27;profiler_dir&#x27;: None, &#x27;args&#x27;: [&#x27;&#x27;], &#x27;socket_timeout&#x27;: 5, &#x27;ssl_ca_certificate&#x27;: None, &#x27;scheduler&#x27;: None, &#x27;interfaces&#x27;: None, &#x27;ssl_private_key&#x27;: &#x27;&#x27;, &#x27;gae&#x27;: None, &#x27;password&#x27;: &#x27;******&#x27;, &#x27;request_queue_size&#x27;: 5, &#x27;ssl_certificate&#x27;: &#x27;&#x27;, &#x27;cronjob&#x27;: False, &#x27;numthreads&#x27;: None, &#x27;quiet&#x27;: False, &#x27;import_models&#x27;: False, &#x27;timeout&#x27;: 10, &#x27;plain&#x27;: False, &#x27;nobanner&#x27;: False}&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>C:\\workspace\\web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>SRV-ESOLVER.DOMAIN.local</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>SRV-ESOLVER</div></td></tr><tr><td><div>192.168.0.4</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.14.6-stable+timestamp.2016.05.10.00.21.47</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_https</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_local</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_restful</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_scheduler</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_shell</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">now</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2019, 1, 7, 13, 34, 3, 396000)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">raw_args</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">raw_extension</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">url</td><td style="vertical-align:top;">:</td><td><div>/gestionale</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">utcnow</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2019, 1, 7, 12, 34, 3, 396000)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi</td><td style="vertical-align:top;">:</td><td><div>&lt;gluon.main.LazyWSGI object at 0x08D2FDD0&gt;</div></td></tr></table></div>'
+tRp62
+sS'frames'
+p63
+(lp64
+(dp65
+S'file'
+p66
+S'C:\\workspace\\web2py\\gluon\\restricted.py'
+p67
+sS'dump'
+p68
+(dp69
+S'environment'
+p70
+S"{'A': <class 'gluon.html.A'>, 'ANY_OF': <class 'gluon.validators.ANY_OF'>, 'ASSIGNJS': <function ASSIGNJS>, 'AppConfig': <function AppConfig>, 'Auth': <class 'gluon.tools.Auth'>, 'B': <class 'gluon.html.B'>, 'BEAUTIFY': <class 'gluon.html.BEAUTIFY'>, 'BODY': <class 'gluon.html.BODY'>, 'BR': <class 'gluon.html.BR'>, 'BUTTON': <class 'gluon.html.BUTTON'>, ...}"
+p71
+sS'ccode'
+p72
+S'<code object <module> at 08D371D0, file "C:\\work...py\\applications\\gestionale\\models\\db.py", line 7>'
+p73
+ssS'lnum'
+p74
+I227
+sS'lines'
+p75
+(dp76
+I224
+S'            ccode = code'
+p77
+sI225
+S'        else:'
+p78
+sI226
+S'            ccode = compile2(code, layer)'
+p79
+sI227
+S'        exec ccode in environment'
+p80
+sI228
+S'    except HTTP:'
+p81
+sI229
+S'        raise'
+p82
+sI230
+S'    except RestrictedError:'
+p83
+sI231
+S'        # do not encapsulate (obfuscate) the original RestrictedError'
+p84
+sI222
+S'    try:'
+p85
+sI223
+S'        if isinstance(code, types.CodeType):'
+p86
+ssS'call'
+p87
+S'(code="# -*- coding: utf-8 -*-\\n\\n# ---------------------...=\'storico_articoli_prodotti_fornitore.table\')\\n\\n\\n\\n", environment={\'A\': <class \'gluon.html.A\'>, \'ANY_OF\': <class \'gluon.validators.ANY_OF\'>, \'ASSIGNJS\': <function ASSIGNJS>, \'AppConfig\': <function AppConfig>, \'Auth\': <class \'gluon.tools.Auth\'>, \'B\': <class \'gluon.html.B\'>, \'BEAUTIFY\': <class \'gluon.html.BEAUTIFY\'>, \'BODY\': <class \'gluon.html.BODY\'>, \'BR\': <class \'gluon.html.BR\'>, \'BUTTON\': <class \'gluon.html.BUTTON\'>, ...}, layer=r\'C:\\workspace\\web2py\\applications\\gestionale\\models\\db.py\')'
+p88
+sS'func'
+p89
+S'restricted'
+p90
+sa(dp91
+g66
+S'C:\\workspace\\web2py\\applications\\gestionale\\models\\db.py'
+p92
+sg68
+(dp93
+S').delete'
+p94
+S'undefined'
+p95
+sS'db'
+p96
+S'<DAL uri="mysql:******@localhost/carpal">'
+p97
+sS'db.enti_leonardo'
+p98
+S'<Table enti_leonardo (id, ente)>'
+p99
+ssg74
+I157
+sg75
+(dp100
+I160
+S''
+sI161
+S''
+sI152
+S''
+sI153
+S'enti_leonardo_set.add("L\'AQUILA - SAS - 104427262")'
+p101
+sI154
+S''
+sI155
+S''
+sI156
+S"db.define_table('enti_leonardo',Field('ente',requires = IS_IN_SET(enti_leonardo_set),default='Nessuno'))"
+p102
+sI157
+S'db(db.enti_leonardo).delete()'
+p103
+sI158
+S'for e in enti_leonardo_set:'
+p104
+sI159
+S'    db.enti_leonardo.insert(ente=e)'
+p105
+ssg87
+S'()'
+p106
+sg89
+S'<module>'
+p107
+sa(dp108
+g66
+S'C:\\workspace\\web2py\\gluon\\packages\\dal\\pydal\\objects.py'
+p109
+sg68
+(dp110
+S'self.query'
+p111
+S'<Query (enti_leonardo.id IS NOT NULL)>'
+p112
+sS'db._adapter'
+p113
+S'<pydal.adapters.mysql.MySQLAdapter object>'
+p114
+sS'db'
+p115
+S'<DAL uri="mysql:******@localhost/carpal">'
+p116
+sS'self'
+p117
+S'<Set (enti_leonardo.id IS NOT NULL)>'
+p118
+sS'tablename'
+p119
+S"'enti_leonardo'"
+p120
+sS'ret'
+p121
+g95
+sS'db._adapter.delete'
+p122
+S'<bound method MySQLAdapter.delete of <pydal.adapters.mysql.MySQLAdapter object>>'
+p123
+ssg74
+I2040
+sg75
+(dp124
+I2035
+S'    def delete(self):'
+p125
+sI2036
+S'        db = self.db'
+p126
+sI2037
+S'        tablename = db._adapter.get_table(self.query)'
+p127
+sI2038
+S'        table = db[tablename]'
+p128
+sI2039
+S'        if any(f(self) for f in table._before_delete): return 0'
+p129
+sI2040
+S'        ret = db._adapter.delete(tablename, self.query)'
+p130
+sI2041
+S'        ret and [f(self) for f in table._after_delete]'
+p131
+sI2042
+S'        return ret'
+p132
+sI2043
+S''
+sI2044
+S'    def update(self, **update_fields):'
+p133
+ssg87
+S'(self=<Set (enti_leonardo.id IS NOT NULL)>)'
+p134
+sg89
+S'delete'
+p135
+sa(dp136
+g66
+S'C:\\workspace\\web2py\\gluon\\packages\\dal\\pydal\\adapters\\base.py'
+p137
+sg68
+(dp138
+S'self'
+p139
+S'<pydal.adapters.mysql.MySQLAdapter object>'
+p140
+sS'self.execute'
+p141
+S'<bound method MySQLAdapter.execute of <pydal.adapters.mysql.MySQLAdapter object>>'
+p142
+sS'sql'
+p143
+S"'DELETE FROM enti_leonardo WHERE (enti_leonardo.id IS NOT NULL);'"
+p144
+ssg74
+I1049
+sg75
+(dp145
+I1044
+S'        tablename = self.db[tablename].sqlsafe'
+p146
+sI1045
+S"        return 'DELETE FROM %s%s;' % (tablename, sql_w)"
+p147
+sI1046
+S''
+sI1047
+S'    def delete(self, tablename, query):'
+p148
+sI1048
+S'        sql = self._delete(tablename, query)'
+p149
+sI1049
+S'        self.execute(sql)'
+p150
+sI1050
+S'        try:'
+p151
+sI1051
+S'            counter = self.cursor.rowcount'
+p152
+sI1052
+S'        except:'
+p153
+sI1053
+S'            counter =  None'
+p154
+ssg87
+S"(self=<pydal.adapters.mysql.MySQLAdapter object>, tablename='enti_leonardo', query=<Query (enti_leonardo.id IS NOT NULL)>)"
+p155
+sg89
+g135
+sa(dp156
+g66
+S'C:\\workspace\\web2py\\gluon\\packages\\dal\\pydal\\adapters\\base.py'
+p157
+sg68
+(dp158
+S'a'
+S"('DELETE FROM enti_leonardo WHERE (enti_leonardo.id IS NOT NULL);',)"
+p159
+sS'self'
+p160
+S'<pydal.adapters.mysql.MySQLAdapter object>'
+p161
+sS'b'
+g21
+sS'self.log_execute'
+p162
+S'<bound method MySQLAdapter.log_execute of <pydal.adapters.mysql.MySQLAdapter object>>'
+p163
+ssg74
+I1388
+sg75
+(dp164
+I1383
+S'        self.db._timings.append((command,time.time()-t0))'
+p165
+sI1384
+S'        del self.db._timings[:-TIMINGSSIZE]'
+p166
+sI1385
+S'        return ret'
+p167
+sI1386
+S''
+sI1387
+S'    def execute(self, *a, **b):'
+p168
+sI1388
+S'        return self.log_execute(*a, **b)'
+p169
+sI1389
+S''
+sI1390
+S'    def execute_test_query(self):'
+p170
+sI1391
+S'        return self.execute(self.test_query)'
+p171
+sI1392
+S''
+ssg87
+S"(self=<pydal.adapters.mysql.MySQLAdapter object>, *a=('DELETE FROM enti_leonardo WHERE (enti_leonardo.id IS NOT NULL);',), **b={})"
+p172
+sg89
+S'execute'
+p173
+sa(dp174
+g66
+S'C:\\workspace\\web2py\\gluon\\packages\\dal\\pydal\\adapters\\base.py'
+p175
+sg68
+(dp176
+S'a'
+S"('DELETE FROM enti_leonardo WHERE (enti_leonardo.id IS NOT NULL);',)"
+p177
+sS'b'
+g21
+sS'self'
+p178
+S'<pydal.adapters.mysql.MySQLAdapter object>'
+p179
+sS'ret'
+p180
+g95
+sS'command'
+p181
+S"'DELETE FROM enti_leonardo WHERE (enti_leonardo.id IS NOT NULL);'"
+p182
+sS'self.get_cursor'
+p183
+S'<bound method MySQLAdapter.get_cursor of <pydal.adapters.mysql.MySQLAdapter object>>'
+p184
+sS').execute'
+p185
+g95
+ssg74
+I1382
+sg75
+(dp186
+I1377
+S'            command = self.filter_sql_command(command)'
+p187
+sI1378
+S'        if self.db._debug:'
+p188
+sI1379
+S"            self.db.logger.debug('SQL: %s' % command)"
+p189
+sI1380
+S'        self.db._lastsql = command'
+p190
+sI1381
+S'        t0 = time.time()'
+p191
+sI1382
+S'        ret = self.get_cursor().execute(command, *a[1:], **b)'
+p192
+sI1383
+S'        self.db._timings.append((command,time.time()-t0))'
+p193
+sI1384
+S'        del self.db._timings[:-TIMINGSSIZE]'
+p194
+sI1385
+S'        return ret'
+p195
+sI1386
+S''
+ssg87
+S"(self=<pydal.adapters.mysql.MySQLAdapter object>, *a=('DELETE FROM enti_leonardo WHERE (enti_leonardo.id IS NOT NULL);',), **b={})"
+p196
+sg89
+S'log_execute'
+p197
+sa(dp198
+g66
+S'c:\\python27\\lib\\site-packages\\pymysql\\cursors.py'
+p199
+sg68
+(dp200
+S'query'
+p201
+S"'DELETE FROM enti_leonardo WHERE (enti_leonardo.id IS NOT NULL);'"
+p202
+sS'self'
+p203
+S'<pymysql.cursors.Cursor object>'
+p204
+sS'result'
+p205
+g95
+sS'self._query'
+p206
+S'<bound method Cursor._query of <pymysql.cursors.Cursor object>>'
+p207
+ssg74
+I170
+sg75
+(dp208
+I165
+S'        while self.nextset():'
+p209
+sI166
+S'            pass'
+p210
+sI167
+S''
+sI168
+S'        query = self.mogrify(query, args)'
+p211
+sI169
+S''
+sI170
+S'        result = self._query(query)'
+p212
+sI171
+S'        self._executed = query'
+p213
+sI172
+S'        return result'
+p214
+sI173
+S''
+sI174
+S'    def executemany(self, query, args):'
+p215
+ssg87
+S"(self=<pymysql.cursors.Cursor object>, query='DELETE FROM enti_leonardo WHERE (enti_leonardo.id IS NOT NULL);', args=None)"
+p216
+sg89
+g173
+sa(dp217
+g66
+S'c:\\python27\\lib\\site-packages\\pymysql\\cursors.py'
+p218
+sg68
+(dp219
+S'q'
+S"'DELETE FROM enti_leonardo WHERE (enti_leonardo.id IS NOT NULL);'"
+p220
+sS'conn.query'
+p221
+S'<bound method Connection.query of <pymysql.connections.Connection object>>'
+p222
+sS'conn'
+p223
+S'<pymysql.connections.Connection object>'
+p224
+ssg74
+I328
+sg75
+(dp225
+I323
+S''
+sI324
+S'    def _query(self, q):'
+p226
+sI325
+S'        conn = self._get_db()'
+p227
+sI326
+S'        self._last_executed = q'
+p228
+sI327
+S'        self._clear_result()'
+p229
+sI328
+S'        conn.query(q)'
+p230
+sI329
+S'        self._do_get_result()'
+p231
+sI330
+S'        return self.rowcount'
+p232
+sI331
+S''
+sI332
+S'    def _clear_result(self):'
+p233
+ssg87
+S"(self=<pymysql.cursors.Cursor object>, q='DELETE FROM enti_leonardo WHERE (enti_leonardo.id IS NOT NULL);')"
+p234
+sg89
+S'_query'
+p235
+sa(dp236
+g66
+S'c:\\python27\\lib\\site-packages\\pymysql\\connections.py'
+p237
+sg68
+(dp238
+S'self._read_query_result'
+p239
+S'<bound method Connection._read_query_result of <pymysql.connections.Connection object>>'
+p240
+sS'self'
+p241
+S'<pymysql.connections.Connection object>'
+p242
+sS'unbuffered'
+p243
+S'False'
+p244
+sS'self._affected_rows'
+p245
+S'0'
+ssg74
+I517
+sg75
+(dp246
+I512
+S'            if PY2:'
+p247
+sI513
+S'                sql = sql.encode(self.encoding)'
+p248
+sI514
+S'            else:'
+p249
+sI515
+S"                sql = sql.encode(self.encoding, 'surrogateescape')"
+p250
+sI516
+S'        self._execute_command(COMMAND.COM_QUERY, sql)'
+p251
+sI517
+S'        self._affected_rows = self._read_query_result(unbuffered=unbuffered)'
+p252
+sI518
+S'        return self._affected_rows'
+p253
+sI519
+S''
+sI520
+S'    def next_result(self, unbuffered=False):'
+p254
+sI521
+S'        self._affected_rows = self._read_query_result(unbuffered=unbuffered)'
+p255
+ssg87
+S"(self=<pymysql.connections.Connection object>, sql='DELETE FROM enti_leonardo WHERE (enti_leonardo.id IS NOT NULL);', unbuffered=False)"
+p256
+sg89
+S'query'
+p257
+sa(dp258
+g66
+S'c:\\python27\\lib\\site-packages\\pymysql\\connections.py'
+p259
+sg68
+(dp260
+S'result.read'
+p261
+S'<bound method MySQLResult.read of <pymysql.connections.MySQLResult object>>'
+p262
+sS'result'
+p263
+S'<pymysql.connections.MySQLResult object>'
+p264
+ssg74
+I732
+sg75
+(dp265
+I736
+S'        return result.affected_rows'
+p266
+sI727
+S'                result.unbuffered_active = False'
+p267
+sI728
+S'                result.connection = None'
+p268
+sI729
+S'                raise'
+p269
+sI730
+S'        else:'
+p270
+sI731
+S'            result = MySQLResult(self)'
+p271
+sI732
+S'            result.read()'
+p272
+sI733
+S'        self._result = result'
+p273
+sI734
+S'        if result.server_status is not None:'
+p274
+sI735
+S'            self.server_status = result.server_status'
+p275
+ssg87
+S'(self=<pymysql.connections.Connection object>, unbuffered=False)'
+p276
+sg89
+S'_read_query_result'
+p277
+sa(dp278
+g66
+S'c:\\python27\\lib\\site-packages\\pymysql\\connections.py'
+p279
+sg68
+(dp280
+S'first_packet'
+p281
+g95
+sS'self'
+p282
+S'<pymysql.connections.MySQLResult object>'
+p283
+sS'self.connection'
+p284
+S'None'
+p285
+sS'self.connection._read_packet'
+p286
+g95
+ssg74
+I1075
+sg75
+(dp287
+I1070
+S'        if self.unbuffered_active:'
+p288
+sI1071
+S'            self._finish_unbuffered_query()'
+p289
+sI1072
+S''
+sI1073
+S'    def read(self):'
+p290
+sI1074
+S'        try:'
+p291
+sI1075
+S'            first_packet = self.connection._read_packet()'
+p292
+sI1076
+S''
+sI1077
+S'            if first_packet.is_ok_packet():'
+p293
+sI1078
+S'                self._read_ok_packet(first_packet)'
+p294
+sI1079
+S'            elif first_packet.is_load_local_packet():'
+p295
+ssg87
+S'(self=<pymysql.connections.MySQLResult object>)'
+p296
+sg89
+S'read'
+p297
+sa(dp298
+g66
+S'c:\\python27\\lib\\site-packages\\pymysql\\connections.py'
+p299
+sg68
+(dp300
+S'packet'
+p301
+S'<pymysql.protocol.MysqlPacket object>'
+p302
+sS'packet.check_error'
+p303
+S'<bound method MysqlPacket.check_error of <pymysql.protocol.MysqlPacket object>>'
+p304
+ssg74
+I684
+sg75
+(dp305
+I679
+S'                continue'
+p306
+sI680
+S'            if bytes_to_read < MAX_PACKET_LEN:'
+p307
+sI681
+S'                break'
+p308
+sI682
+S''
+sI683
+S'        packet = packet_type(buff, self.encoding)'
+p309
+sI684
+S'        packet.check_error()'
+p310
+sI685
+S'        return packet'
+p311
+sI686
+S''
+sI687
+S'    def _read_bytes(self, num_bytes):'
+p312
+sI688
+S'        self._sock.settimeout(self._read_timeout)'
+p313
+ssg87
+S"(self=<pymysql.connections.Connection object>, packet_type=<class 'pymysql.protocol.MysqlPacket'>)"
+p314
+sg89
+S'_read_packet'
+p315
+sa(dp316
+g66
+S'c:\\python27\\lib\\site-packages\\pymysql\\protocol.py'
+p317
+sg68
+(dp318
+S'self._data'
+p319
+S"'\\xff\\xb5\\x04#HY000Lock wait timeout exceeded; try restarting transaction'"
+p320
+sS'self'
+p321
+S'<pymysql.protocol.MysqlPacket object>'
+p322
+sS'global err'
+p323
+S"<module 'pymysql.err' from 'c:\\python27\\lib\\site-packages\\pymysql\\err.pyc'>"
+p324
+sS'err.raise_mysql_exception'
+p325
+S'<function raise_mysql_exception>'
+p326
+ssg74
+I220
+sg75
+(dp327
+I224
+S''
+sI215
+S'        if self.is_error_packet():'
+p328
+sI216
+S'            self.rewind()'
+p329
+sI217
+S'            self.advance(1)  # field_count == error (we already know that)'
+p330
+sI218
+S'            errno = self.read_uint16()'
+p331
+sI219
+S'            if DEBUG: print("errno =", errno)'
+p332
+sI220
+S'            err.raise_mysql_exception(self._data)'
+p333
+sI221
+S''
+sI222
+S'    def dump(self):'
+p334
+sI223
+S'        dump_packet(self._data)'
+p335
+ssg87
+S'(self=<pymysql.protocol.MysqlPacket object>)'
+p336
+sg89
+S'check_error'
+p337
+sa(dp338
+g66
+S'c:\\python27\\lib\\site-packages\\pymysql\\err.py'
+p339
+sg68
+(dp340
+S'errorclass'
+p341
+S"<class 'pymysql.err.InternalError'>"
+p342
+sS'errno'
+p343
+S'1205'
+p344
+sS'errval'
+p345
+S"u'Lock wait timeout exceeded; try restarting transaction'"
+p346
+ssg74
+I109
+sg75
+(dp347
+I100
+S'def raise_mysql_exception(data):'
+p348
+sI101
+S"    errno = struct.unpack('<h', data[1:3])[0]"
+p349
+sI102
+S'    is_41 = data[3:4] == b"#"'
+p350
+sI103
+S'    if is_41:'
+p351
+sI104
+S'        # client protocol 4.1'
+p352
+sI105
+S"        errval = data[9:].decode('utf-8', 'replace')"
+p353
+sI106
+S'    else:'
+p354
+sI107
+S"        errval = data[3:].decode('utf-8', 'replace')"
+p355
+sI108
+S'    errorclass = error_map.get(errno, InternalError)'
+p356
+sI109
+S'    raise errorclass(errno, errval)'
+p357
+ssg87
+S"(data='\\xff\\xb5\\x04#HY000Lock wait timeout exceeded; try restarting transaction')"
+p358
+sg89
+S'raise_mysql_exception'
+p359
+sasS'pyver'
+p360
+S'Python 2.7.13: c:\\python27\\python.exe (prefix: c:\\python27)'
+p361
+sS'session'
+p362
+g61
+(S's\xfb\x08\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">auth</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">expiration</td><td style="vertical-align:top;">:</td><td><div>2592000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">hmac_key</td><td style="vertical-align:top;">:</td><td><div>9767e194-478d-423e-8d9c-50f8be3d45e6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">last_visit</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2018, 12, 20, 8, 35, 17, 663000)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remember_me</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">user</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">email</td><td style="vertical-align:top;">:</td><td><div>commerciale@microcarp.com</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">first_name</td><td style="vertical-align:top;">:</td><td><div>matteo</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">id</td><td style="vertical-align:top;">:</td><td><div>3L</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">last_name</td><td style="vertical-align:top;">:</td><td><div>matteo</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">registration_id</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">registration_key</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">reset_password_key</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">username</td><td style="vertical-align:top;">:</td><td><div>matteo</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">user_groups</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">flash</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr></table></div>'
+tRp363
+sS'etype'
+p364
+S"<class 'pymysql.err.InternalError'>"
+p365
+sS'date'
+p366
+S'Mon Jan 07 13:34:54 2019'
+p367
+sS'response'
+p368
+g61
+(S'so\x17\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">body</td><td style="vertical-align:top;">:</td><td><div>&lt;cStringIO.StringO object at 0x08D32A20&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">session_id_gestionale</td><td style="vertical-align:top;">:</td><td><div>192.168.0.177-83e5cc6c-db02-4e7d-b4a9-1832f9855945<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div>/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">delimiters</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>{{</div></td></tr><tr><td><div>}}</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">files</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">flash</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">form_label_separator</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">formstyle</td><td style="vertical-align:top;">:</td><td><div>bootstrap3_inline</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">generic_patterns</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">headers</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">X-Powered-By</td><td style="vertical-align:top;">:</td><td><div>web2py</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">menu</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">meta</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">models_to_run</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>^\\w+\\.py$</div></td></tr><tr><td><div>^default/\\w+\\.py$</div></td></tr><tr><td><div>^default/index/\\w+\\.py$</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">postprocessing</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_client</td><td style="vertical-align:top;">:</td><td><div>192.168.0.177</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_compression_level</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_expires</td><td style="vertical-align:top;">:</td><td><div>2592000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_data_name</td><td style="vertical-align:top;">:</td><td><div>session_data_gestionale</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_file</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;C:\\\\workspace\\\\web2py\\\\applications\\\\gestionale\\\\sessions\\\\192\\\\0ff\\\\192.168.0.177-83e5cc6c-db02-4e7d-b4a9-1832f9855945&#x27;, mode &#x27;rb+&#x27; at 0x0909D4F0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_filename</td><td style="vertical-align:top;">:</td><td><div>C:\\workspace\\web2py\\applications\\gestionale\\sessions\\192.168.0.177-83e5cc6c-db02-4e7d-b4a9-1832f9855945</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_hash</td><td style="vertical-align:top;">:</td><td><div>872ff154fff547eaac6c28732b689169</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id</td><td style="vertical-align:top;">:</td><td><div>192.168.0.177-83e5cc6c-db02-4e7d-b4a9-1832f9855945</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_name</td><td style="vertical-align:top;">:</td><td><div>session_id_gestionale</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_locked</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_masterapp</td><td style="vertical-align:top;">:</td><td><div>gestionale</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_new</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_storage_type</td><td style="vertical-align:top;">:</td><td><div>file</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">status</td><td style="vertical-align:top;">:</td><td><div>200</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">view</td><td style="vertical-align:top;">:</td><td><div>default/index.html</div></td></tr></table></div>'
+tRp369
+sS'locals'
+p370
+(dp371
+S'errorclass'
+p372
+S"<class 'pymysql.err.InternalError'>"
+p373
+sS'errno'
+p374
+S'1205'
+p375
+sS'is_41'
+p376
+S'True'
+p377
+sS'errval'
+p378
+S"u'Lock wait timeout exceeded; try restarting transaction'"
+p379
+sS'data'
+p380
+S"'\\xff\\xb5\\x04#HY000Lock wait timeout exceeded; try restarting transaction'"
+p381
+sssS'traceback'
+p382
+S'Traceback (most recent call last):\n  File "C:\\workspace\\web2py\\gluon\\restricted.py", line 227, in restricted\n    exec ccode in environment\n  File "C:\\workspace\\web2py\\applications\\gestionale\\models\\db.py", line 157, in <module>\n    db(db.enti_leonardo).delete()\n  File "C:\\workspace\\web2py\\gluon\\packages\\dal\\pydal\\objects.py", line 2040, in delete\n    ret = db._adapter.delete(tablename, self.query)\n  File "C:\\workspace\\web2py\\gluon\\packages\\dal\\pydal\\adapters\\base.py", line 1049, in delete\n    self.execute(sql)\n  File "C:\\workspace\\web2py\\gluon\\packages\\dal\\pydal\\adapters\\base.py", line 1388, in execute\n    return self.log_execute(*a, **b)\n  File "C:\\workspace\\web2py\\gluon\\packages\\dal\\pydal\\adapters\\base.py", line 1382, in log_execute\n    ret = self.get_cursor().execute(command, *a[1:], **b)\n  File "c:\\python27\\lib\\site-packages\\pymysql\\cursors.py", line 170, in execute\n    result = self._query(query)\n  File "c:\\python27\\lib\\site-packages\\pymysql\\cursors.py", line 328, in _query\n    conn.query(q)\n  File "c:\\python27\\lib\\site-packages\\pymysql\\connections.py", line 517, in query\n    self._affected_rows = self._read_query_result(unbuffered=unbuffered)\n  File "c:\\python27\\lib\\site-packages\\pymysql\\connections.py", line 732, in _read_query_result\n    result.read()\n  File "c:\\python27\\lib\\site-packages\\pymysql\\connections.py", line 1075, in read\n    first_packet = self.connection._read_packet()\n  File "c:\\python27\\lib\\site-packages\\pymysql\\connections.py", line 684, in _read_packet\n    packet.check_error()\n  File "c:\\python27\\lib\\site-packages\\pymysql\\protocol.py", line 220, in check_error\n    err.raise_mysql_exception(self._data)\n  File "c:\\python27\\lib\\site-packages\\pymysql\\err.py", line 109, in raise_mysql_exception\n    raise errorclass(errno, errval)\nInternalError: (1205, u\'Lock wait timeout exceeded; try restarting transaction\')\n'
+p383
+s.

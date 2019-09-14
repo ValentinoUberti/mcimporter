@@ -1,0 +1,264 @@
+{{ if not errore:}}
+
+<div id="id1">
+    
+<span align="center"><b>Cliente : </b> {{=nome_cliente}}</span>
+<table class="table">
+    <tr>
+        <td>Codice articolo<br>Ubicazione</td> <td>{{=codice_articolo}}<br>{{=ubicazione}}</td>
+    
+        <td>Descrizione articolo</td> <td>{{=descrizione}}</td>
+    </tr>
+     <tr>
+        <td>Codice ordine</td> <td>{{=codice_ordine}}</td>
+        <td>Riferimento ordine</td> <td>{{=riferimento_ordine}}</td>
+    </tr>
+     <tr>
+        <td>Data inserimento ordine</td> <td>{{=data_inserimento}}</td>
+        <td>Quantità richiesta per l'ordine:</td> <td>{{=quantita_ordine}}</td>
+    </tr>
+    
+    <tr>
+        <td>Quantità prodotta</td> <td><input type="text" id="aggiorna_giacenza" value="{{=quantita_prodotta}}"></td>
+        <td>Quantità contenitore</td> <td><input type="text" id="contenitore" value=""></td>
+    </tr>
+    
+    
+    
+</table>
+ {{if riga_evasa:}}
+ <h3>Riga evasa in ddt </h3>
+ {{for ddt in ddts:}}
+ 	{{=ddt}}
+ {{pass}}
+
+
+
+ {{pass}}</div>
+ 
+<div class="col-md-12 text-center"> 
+    <button id="singlebutton" name="singlebutton" class="btn btn-default" onclick="stampa('mc')">Stampa</button> 
+</div>
+
+ 
+
+ 
+ 
+    <script>
+    
+function stampa(c)
+    
+    {
+      var cliente = "{{=nome_cliente}}";
+      var codice_articolo =  "{{=codice_articolo}}";
+      var descrizione =  "{{=descrizione}}";
+      var quantita =  "{{=quantita_prodotta}}";
+      var lotto = ""
+      var numero_etichette =  1
+      
+      var ordine =  "{{=riferimento_ordine}}";
+      var contenitore =  $("#contenitore").val();
+      var destinazione = "";
+    
+      justoop.gestionaleRpc.stampaEtichetta(cliente,codice_articolo,descrizione,quantita,lotto,numero_etichette,ordine,contenitore,destinazione).success(function _(data)
+    {
+    });
+    }
+
+  $(document).ready(function ()
+                      {
+  
+     $('#prodotta').focus();
+    })
+  
+  
+  
+  function riserva_da_giacenza()
+  
+  {
+     ele = $(".w2p_flash.alert.alert-dismissable")
+     ele.html('').slideUp()
+             
+     id_riga_ordine = {{=id_riga_ordine}}
+     riserva_da_giacenza= $("#riserva_da_giacenza").val()
+  
+    
+    
+      justoop.gestionaleRpc.riservaGiacenza(id_riga_ordine,riserva_da_giacenza).success(function _(data)
+                                                                                                                                        
+                                                                                                                                            
+       { 
+           
+           if (typeof(data.error) == "undefined")
+           {
+		
+		
+	     ele.css("background-color","#f9edbe")
+             ele = $(".w2p_flash.alert.alert-dismissable")
+             ele.html('Aggiornamento riuscito').slideDown()
+             
+             web2py_component("{{=URL('default', 'return_dettagli_articolo_da_riga_ordine')}}" +
+                 "?id_riga_ordine=" + id_riga_ordine,
+                 target='id2')
+               
+           }
+            else
+            {
+            
+            ele = $(".w2p_flash.alert.alert-dismissable")
+            ele.html('Errore in aggiornamento').slideDown()
+            ele.css("background-color","#f4424b")
+            
+            }
+       });
+           
+    
+  
+  
+  }
+  
+  
+    function disdire_giacenza()
+  
+  {
+     ele = $(".w2p_flash.alert.alert-dismissable")
+     ele.html('').slideUp()
+             
+     id_riga_ordine = {{=id_riga_ordine}}
+     riserva_da_giacenza= $("#disdire_giacenza").val()
+  
+    
+    
+      justoop.gestionaleRpc.disdireGiacenza(id_riga_ordine,riserva_da_giacenza).success(function _(data)
+                                                                                                                                        
+                                                                                                                                            
+       { 
+           
+           if (typeof(data.error) == "undefined")
+           {
+
+             ele = $(".w2p_flash.alert.alert-dismissable")
+             ele.html('Aggiornamento riuscito').slideDown()
+             
+             web2py_component("{{=URL('default', 'return_dettagli_articolo_da_riga_ordine')}}" +
+                 "?id_riga_ordine=" + id_riga_ordine,
+                 target='id2')
+               
+           }
+            else
+            {
+            
+            ele = $(".w2p_flash.alert.alert-dismissable")
+            ele.html('Errore in aggiornamento').slideDown()
+            ele.css("background-color","#f4424b")
+            
+            }
+       });
+           
+    
+  
+  
+  }
+  
+  function inserisci_quantita()
+    {
+        
+     quantita_prodotta =$('#prodotta').val()
+        if (isNaN(quantita_prodotta) || quantita_prodotta < 0 || quantita_prodotta > 100000) {
+        debugger
+        ele = $(".w2p_flash.alert.alert-dismissable")
+        ele.html('Inserire un valore numerico').slideDown()
+        ele.css("background-color","#f4424b")
+        
+    } else 
+    
+    {
+        ele = $(".w2p_flash.alert.alert-dismissable")
+        ele.html('Inserire un valore numerico').slideUp()
+        
+        justoop.gestionaleRpc.aggiornaQuantita('{{=id_riga_ordine}}','{{=codice_articolo}}',quantita_prodotta).success(function _(data)
+                                                                                                                                        
+                                                                                                                                            
+       { 
+           //debugger
+           if (typeof(data.error) == "undefined")
+           {
+             $("#id1").html("")
+             ele = $(".w2p_flash.alert.alert-dismissable")
+             ele.html('Aggiornamento riuscito').slideDown()
+             $('#barcode').focus();
+               
+           }
+            else
+            {
+            
+            ele = $(".w2p_flash.alert.alert-dismissable")
+            ele.html('Errore in aggiornamento').slideDown()
+            ele.css("background-color","#f4424b")
+            
+            }
+       });
+           
+    
+    }
+    
+        
+        
+       
+    }
+    
+ function aggiorna_giacenza()
+    {
+        
+     quantita_prodotta =$('#aggiorna_giacenza').val()
+        if (isNaN(quantita_prodotta) || quantita_prodotta < 0 || quantita_prodotta > 100000) {
+        ele = $(".w2p_flash.alert.alert-dismissable")
+        ele.html('Inserire un valore numerico').slideDown()
+        ele.css("background-color","#f4424b")
+        
+    } else 
+    
+    {
+        ele = $(".w2p_flash.alert.alert-dismissable")
+        ele.html('Inserire un valore numerico').slideUp()
+        
+        justoop.gestionaleRpc.aggiornaGiacenza('{{=id_riga_ordine}}',quantita_prodotta).success(function _(data)
+                                                                                                                                        
+                                                                                                                                            
+       { 
+           //debugger
+           if (typeof(data.error) == "undefined")
+           {
+             //$("#id1").html("")
+             ele = $(".w2p_flash.alert.alert-dismissable")
+             ele.html('Aggiornamento riuscito').slideDown()
+             //$('#barcode').focus();
+             web2py_component("{{=URL('default', 'return_dettagli_articolo_da_riga_ordine')}}" +
+                 "?id_riga_ordine=" + id_riga_ordine,
+                 target='id2')
+               
+           }
+            else
+            {
+            
+            ele = $(".w2p_flash.alert.alert-dismissable")
+            ele.html('Errore in aggiornamento').slideDown()
+            ele.css("background-color","#f4424b")
+            
+            }
+       });
+           
+    
+    }
+    
+        
+        
+       
+    }
+   
+  
+</script>
+
+{{else:}}
+<h1>Lettura non riuscita. Riprovare</h1>
+{{pass}}

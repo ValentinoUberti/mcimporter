@@ -1,0 +1,35 @@
+{{extend 'layout.html'}}
+<script src="https://maps.googleapis.com/maps/api/js"></script> 
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<h1>Seleziona l'anno per visualizzare il fatturato Leonardo SPA</h1>
+<h2>
+    <select name="select_year" id="select_year" onchange="change_portafolio()">
+    <option value="2017">2017</option>
+     <option value="2018">2018</option>
+     <option value="2019">2019</option>
+     <option value="2020">2020</option>
+    
+</select>
+        
+</h2>
+<div class="row">
+    <div class="col-md-12" id="portafolio">
+        {{=LOAD('default','calcola_totale_per_anno_leonardo_data',args=current_year,ajax=True)}}
+    </div>
+    
+</div>
+<script language="javascript">
+   
+    
+    function change_portafolio()
+    {
+     var year=$("#select_year").val();
+        
+     web2py_component("{{=URL('default', 'calcola_totale_per_anno_leonardo_data')}}" +
+                 "?y=" + year,
+                 target='portafolio')
+     
+    }
+    
+</script>
+

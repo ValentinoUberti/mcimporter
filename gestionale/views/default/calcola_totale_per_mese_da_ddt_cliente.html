@@ -1,0 +1,49 @@
+{{extend 'layout.html'}}
+<script src="https://maps.googleapis.com/maps/api/js"></script> 
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<h1>Seleziona il mese per visualizzare il fatturabile</h1>
+<h2>
+    <select name="select_mese" id="select_mese" onchange="change_portafolio()">
+    <option value="1">Gennaio</option>
+     <option value="2">Febbraio</option>
+     <option value="3">Marzo</option>
+     <option value="4">Aprile</option>
+     <option value="5">Maggio</option>
+     <option value="6">Giugno</option>
+     <option value="7">Luglio</option>
+     <option value="8">Agosto</option>
+     <option value="9">Settembre</option>
+     <option value="10">Ottobre</option>
+     <option value="11">Novembre</option>
+     <option value="12">Dicembre</option>
+</select>
+        
+</h2>
+<div class="row">
+    <div class="col-md-12" id="portafolio">
+        {{=LOAD('default','calcola_totale_per_mese_da_ddt_cliente_data',args=current_month,ajax=True)}}
+    </div>
+    
+</div>
+<script language="javascript">
+    $( document ).ready(function() {
+        
+      
+    var d = new Date();
+    var n = d.getMonth() +1;
+        
+    
+    $("#select_mese").val(n).change();
+    
+    })
+    
+    function change_portafolio()
+    {
+     var month2=$("#select_mese").val();
+        
+     web2py_component("{{=URL('default', 'calcola_totale_per_mese_da_ddt_cliente_data')}}" +
+                 "?m=" + month2,
+                 target='portafolio')
+     
+    }
+</script>

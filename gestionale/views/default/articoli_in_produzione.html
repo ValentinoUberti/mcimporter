@@ -1,0 +1,69 @@
+{{extend 'layout.html'}}
+
+<style>
+.loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+  display: none;
+  z-index: 10000;
+  top: 10%;
+  left: 45%;
+  bottom: 0;
+  right: 0;
+  overflow: visible;
+  position: fixed;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+</style>
+<div id="ajaxspinner" class="loader" ></div>
+<h1>Articoli in produzione</h1>
+<button id="aggiornaArticoli" onclick="aggiornaArticoli()">Aggiorna gli articoli</button>
+{{=form}}
+
+<script>
+
+function stampaRcp()
+{   justoop.gestionaleRpc.stampaRcp(arguments).success(function _(data)
+                                                           {
+    
+	 if (typeof(data.error) == "undefined")
+     {
+  		w = window.open("../static/rcp.pdf")
+  	
+     }
+	console.log(data);
+});
+}
+
+function aggiornaArticoli() {
+const Url="/gestionale/default/articoli_in_produzione_cron";
+$('#ajaxspinner').show();
+$("#aggiornaArticoli").hide()
+
+$.ajax({
+     url: Url,
+     type:"GET",
+     success: function() {
+          //alert("Aggiornamento completato")
+          location.reload()
+     },
+     error: function() {
+          alert("Errore in aggiornamento")
+          $("#aggiornaArticoli").show()
+          $('#ajaxspinner').hide();
+     }
+})
+
+
+
+}
+</script>

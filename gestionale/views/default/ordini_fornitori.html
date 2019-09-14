@@ -1,0 +1,72 @@
+{{extend 'layout.html'}}
+<h1>Inserisci nuovo ordine fornitore</h1>
+{{=ordini_fornitori_form}}
+<hr>
+<h2>
+    Ordini inseriti
+</h2>
+{{=righe_in_ordine_fornitore_form}}
+
+
+<script language="javascript">
+
+    $(document).ready(function() {
+        $("#ordine_fornitore_nome_fornitore").change(function() {
+         get_listino()
+         get_pagamenti();
+        
+        });
+        
+ 
+    });
+    
+    function stampaOrdineFornitore()
+    {
+    
+        justoop.gestionaleRpc.stampaOrdineFornitore(arguments).success(function _(data)
+       
+                                                                                                                                   
+                                                                                                                                            
+       { 
+           console.log(data)
+           console.log("Downloading");
+           w = window.open("../../gestionale/static/ordine_fornitore.pdf") 
+       location.href="/gestionale/default/ordini_fornitori";
+       });
+        
+        
+    }
+    
+    function get_listino()
+    {
+        nome_cliente =  $("#ordine_fornitore_nome_fornitore").val();
+        justoop.gestionaleRpc.returnListini(nome_cliente,"fornitore").success(function _(data)
+                                                               {
+            objs = $.parseJSON(data.result)
+            $("#ordine_fornitore_listino").empty();
+            
+            $.each(objs, function (i,item) {
+            
+            $('#ordine_fornitore_listino').append($('<option>', { 
+                    value: item.nome_listino,
+                    text : item.nome_listino }))
+                                                
+                                                });
+            
+        });
+    }   
+        function get_pagamenti()
+    {
+        nome_cliente =  $("#ordine_fornitore_nome_fornitore").val();
+        justoop.gestionaleRpc.returnPagamenti(nome_cliente,"fornitore").success(function _(data)
+                                                               {
+            s = data.result
+                            $("#ordine_fornitore_pagamento").val(s);             
+                                                });
+            
+    }
+                                                               
+        
+    
+ 
+</script>

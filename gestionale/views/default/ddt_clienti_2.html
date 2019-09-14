@@ -1,0 +1,192 @@
+{{extend 'layout.html'}}
+<div class="row">
+    <div class="col-md-4">
+        <h3>Scelta ordini per cliente {{=nome_cliente}} <br> Numero DDT corrente : {{=numero_ddt_corrente}}</h3>
+        {{=righe_in_ordine_cliente_form}}
+    </div>
+    <div class="col-md-8" >
+        <h3>Elenco righe</h3>
+        <div id="id2">
+            
+       
+        {{=LOAD('default','righe_in_ddt_cliente',ajax=True)}}
+             </div>
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col-md-4">
+        <b>Luogo di consegna : </b><select id="luogo_consegna">
+        {{for o in luoghi:}}
+            <option name="{{=o}}">{{=o}}</option>
+        {{pass}}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <b>Trasporto a mezzo : </b><select id="trasporto">
+        {{for o in trasporto_a_mezzo:}}
+            <option name="{{=o}}"{{if selected_trasporto==o:}} selected="selected" {{pass}}  >{{=o}}</option>
+        {{pass}}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <b>Ditta : (solo se vettore) </b><input type="text" id="ditta" {{if selected_vettore is not None:}} value="{{=selected_vettore}}" {{pass}}/>
+        
+    </div>
+     <div class="col-md-3">
+        <b>Domicilio : (solo se vettore) </b><input type="text" id="domicilio"/>
+        
+    </div>
+    
+</div>
+<br>
+<div class="row">
+  
+        <div class="col-md-4">
+        <b>Aspetto esteriore dei beni </b>
+            <select id="scatola">
+        {{for o in aspetto_esteriore_dei_beni:}}
+            <option name="{{=o}}">{{=o}}</option>
+        {{pass}}
+        </select>
+            
+            
+           
+       
+        </div>
+    
+     <div class="col-md-2">
+        <b>Numero colli </b><input type="text" id="numero_colli"/>
+       
+        </div>
+    <div class="col-md-4">  <b>Porto :</b><select id="porto">
+       
+        {{for o in porto:}}
+            <option name="{{=o}}" {{if selected_porto==o:}} selected="selected" {{pass}}>{{=o}}</option>
+        {{pass}}
+        </select>
+       
+    </div>
+    
+</div>
+<br>
+<div class="row">
+     <div class="col-md-6">
+        <b>Annotazioni </b><input type="text" id="annotazioni" size="100"/>
+       
+    </div>
+    <div class="col-md-3">
+        <b>Peso Kg </b><input type="text" id="peso"/>
+       
+    </div>
+    <div class="col-md-3">
+        <b>Causale</b> <select id="causale">
+        {{for o in causali:}}
+            <option name="{{=o}}" {{if selected_causale==o:}} selected="selected" {{pass}}>{{=o}}</option>
+        {{pass}}
+        
+        
+        </select>
+        
+       
+    </div>
+    
+</div>
+<br><br>
+<div class="row">
+    <div class="col-md-5">
+        
+    </div>
+    <div class="col-md-4">
+        {{if not error:}}
+        <input type="button" class="btn btn_default" onclick="inserisciDdtPreview({{=id_ddt}})" value="ANTEPRIMA" ></input>
+        <input type="button" class="btn btn_default" onclick="inserisciDdt({{=id_ddt}})" value="Crea e SALVA DDT" ></input>
+    {{pass}}
+    </div>
+
+    
+</div>
+
+<script language="javascript">
+    
+  var $idown;  // Keep it outside of the function, so it's initialized once.
+
+    
+    function aggiungiRighe()
+    {   justoop.gestionaleRpc.addRowToDdt(arguments).success(function _(data)
+                                                               {
+        web2py_component('{{=URL(r=request,c='default',f='righe_in_ddt_cliente')}}','id2');
+    });
+    }
+
+    function inserisciDdt(id_ddt)
+    {
+        if(!confirm('Confermi di aver controllato tutti i dati?')) return "";
+    
+        luogo_consegna=$("#luogo_consegna").val()
+         trasporto=$("#trasporto").val()
+          ditta=$("#ditta").val()
+           domicilio=$("#domicilio").val()
+            scatola=$("#scatola").val()
+             numero_colli=$("#numero_colli").val()
+              porto=$("#porto").val()
+               annotazioni=$("#annotazioni").val()
+                peso=$("#peso").val()
+                causale=$("#causale").val()
+                data_scelta = ""
+        
+    
+       justoop.gestionaleRpc.insertDdt(id_ddt,luogo_consegna,trasporto,ditta,domicilio,scatola,numero_colli,porto,annotazioni,peso,causale,data_scelta).success(function _(data)
+       
+                                                                                                                                   
+                                                                                                                                            
+       { 
+           //debugger
+           if (typeof(data.error) == "undefined")
+           {
+               console.log("Downloading");
+               w = window.open("../../static/html.pdf")   
+               location.href="/gestionale/default/ddt_clienti";
+           }
+       });
+           
+    
+    }
+    
+    function inserisciDdtPreview(id_ddt)
+    {
+    
+        luogo_consegna=$("#luogo_consegna").val()
+         trasporto=$("#trasporto").val()
+          ditta=$("#ditta").val()
+           domicilio=$("#domicilio").val()
+            scatola=$("#scatola").val()
+             numero_colli=$("#numero_colli").val()
+              porto=$("#porto").val()
+               annotazioni=$("#annotazioni").val()
+                peso=$("#peso").val()
+                causale=$("#causale").val()
+                data_scelta = ""
+        
+    
+       justoop.gestionaleRpc.insertDdtPreview(id_ddt,luogo_consegna,trasporto,ditta,domicilio,scatola,numero_colli,porto,annotazioni,peso,causale,data_scelta).success(function _(data)
+       
+                                                                                                                                   
+                                                                                                                                            
+       { 
+           //debugger
+           if (typeof(data.error) == "undefined")
+           {
+               console.log("Downloading");
+               w = window.open("../../static/html.pdf")   
+               
+           }
+       });
+           
+    
+    }
+    
+  
+
+//$("#causale").val('Vendita');
+</script>

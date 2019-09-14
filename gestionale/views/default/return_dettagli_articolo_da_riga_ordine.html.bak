@@ -1,0 +1,88 @@
+<div id="id1">
+    
+
+<table class="table">
+    <tr>
+        <td>Codice articolo</td> <td>{{=codice_articolo}}</td>
+    </tr>
+    <tr>
+        <td>Descrizione articolo</td> <td>{{=descrizione}}</td>
+    </tr>
+     <tr>
+        <td>Codice ordine</td> <td>{{=codice_ordine}}</td>
+    </tr>
+     <tr>
+        <td>Riferimento ordine</td> <td>{{=riferimento_ordine}}</td>
+    </tr>
+     <tr>
+        <td>Data inserimento ordine</td> <td>{{=data_inserimento}}</td>
+    </tr>
+    <tr>
+        <td>Giacenza attuale</td> <td>{{=giacenza}}</td>
+    </tr>
+    <tr>
+        <td>Quantità prodotta</td> <td><input type="text" id="prodotta"></td>
+    </tr>
+    <tr>
+        <td><button class="btn btn-default" onclick="inserisci_quantita()">
+            Inserisci
+            </button></td> <td></td>
+    </tr>
+</table>
+</div>
+    <script>
+
+  $(document).ready(function ()
+                      {
+  
+     $('#prodotta').focus();
+    })
+  
+  function inserisci_quantita()
+    {
+        
+     quantita_prodotta =$('#prodotta').val()
+        if (isNaN(quantita_prodotta) || quantita_prodotta < 1 || quantita_prodotta > 100000) {
+        ele = $(".w2p_flash.alert.alert-dismissable")
+        ele.html('Inserire un valore numerico').slideDown()
+        ele.css("background-color","#f4424b")
+        
+    } else 
+    
+    {
+        ele = $(".w2p_flash.alert.alert-dismissable")
+        ele.html('Inserire un valore numerico').slideUp()
+        
+        justoop.gestionaleRpc.aggiornaQuantita({{=id_riga_ordine}},{{=codice_articolo}},quantita_prodotta).success(function _(data)
+                                                                                                                                        
+                                                                                                                                            
+       { 
+           //debugger
+           if (typeof(data.error) == "undefined")
+           {
+             $("#id1").html("")
+             
+               
+           }
+            else
+            {
+            
+            ele = $(".w2p_flash.alert.alert-dismissable")
+            ele.html('Errore in aggiornamento').slideDown()
+            ele.css("background-color","#f4424b")
+            
+            }
+       });
+           
+    
+    }
+    
+        
+        
+       
+    }
+    
+    
+   
+  
+</script>

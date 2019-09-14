@@ -1,0 +1,22 @@
+{{extend 'layout.html'}}
+<h1>Anagrafica banche Microcarp</h1>
+{{=anagrafica_banche_form}}
+
+
+<script>
+    
+$("#anagrafica_banche_codice_sottoconto").change(searchPianoDeiSottoConti);
+    
+function searchPianoDeiSottoConti()
+{
+    val = $("#anagrafica_banche_codice_sottoconto").val();
+       
+justoop.gestionaleRpc.searchPianoDeiConti(val).success(function _(data)
+                                                       
+{
+        $("#anagrafica_banche_descrizione_sottoconto").val(data.result[5]);
+    
+    
+});
+}
+      </script>
