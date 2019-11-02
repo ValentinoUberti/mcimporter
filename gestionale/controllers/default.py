@@ -154,12 +154,12 @@ def upload_csv():
                       XLSM.write(int(startingRow)+1,(day*2)-1+5,fixHoursAndRestFriday(hours))
                       XLSM.write(int(startingRow)+1,(day*2)-2+5,"S1")
                       XLSM.write(int(startingRow)+2,(day*2)-1+5,1)
-                      XLSM.write(int(startingRow)+2,(day*2)-2+5,"ROL")
+                      XLSM.write(int(startingRow)+2,(day*2)-2+5,"FR")
                   else:
                       if hours>0:
                          XLSM.write(int(startingRow),(day*2)-1+5,fixHours(hours))
                          XLSM.write(int(startingRow)+2,(day*2)-1+5,fixHoursAndRest(hours)-1)
-                         XLSM.write(int(startingRow)+2,(day*2)-2+5,"ROL")
+                         XLSM.write(int(startingRow)+2,(day*2)-2+5,"FR")
 
               else:
                   if hours > 7.9:
